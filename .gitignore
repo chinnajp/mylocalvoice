@@ -34,3 +34,8 @@ ui-debug.log
 *.njsproj
 *.sln
 *.sw?
+
+# Firebase service account (never commit)
+serviceAccount.json
+*-firebase-adminsdk-*.json
+

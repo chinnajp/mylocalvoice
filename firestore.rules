@@ -1,10 +1,50 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Open for local emulator / MVP citizen reporting.
-    // Tighten for production cloud (see FIREBASE_SETUP.md).
-    match /{document=**} {
-      allow read, write: if true;
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isPresident() {
+      return isAdmin()
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'president';
+    }
+
+    match /villages/{villageId} {
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if isPresident();
+
+      match /complaints/{complaintId} {
+        allow read: if true;
+        allow create: if true;
+        allow update: if true;
+        allow delete: if isPresident();
+      }
+
+      match /activityLog/{logId} {
+        allow read: if true;
+        allow create: if true;
+      }
+
+      match /meta/{docId} {
+        allow read, write: if true;
+      }
+
+      match /announcements/{id} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+
+    match /admins/{uid} {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if false;
     }
   }
 }
