@@ -211,9 +211,10 @@ export function ReportPage() {
 
           <div>
             <Label>{t('report.photos')}</Label>
+            <p className="text-xs text-vc-muted mb-1.5">Optional — JPG/PNG, up to 6 photos</p>
             <label className="flex flex-col items-center justify-center gap-2 border border-dashed dark:border-vc-border border-light-border rounded-xl p-6 cursor-pointer hover:border-sky-400/50 transition">
               <ImagePlus className="h-6 w-6 text-vc-muted" />
-              <span className="text-sm text-vc-muted">Upload up to 6 photos</span>
+              <span className="text-sm text-vc-muted">Tap to upload photos</span>
               <input
                 type="file"
                 accept="image/*"
@@ -224,8 +225,22 @@ export function ReportPage() {
             </label>
             {photoPreviews.length > 0 ? (
               <div className="flex flex-wrap gap-2 mt-3">
-                {photoPreviews.map((src) => (
-                  <img key={src} src={src} alt="" className="h-20 w-20 object-cover rounded-lg border border-vc-border" />
+                {photoPreviews.map((src, idx) => (
+                  <div key={src} className="relative">
+                    <img src={src} alt="" className="h-20 w-20 object-cover rounded-lg border border-vc-border" />
+                    <button
+                      type="button"
+                      className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs"
+                      onClick={() => {
+                        const next = photos.filter((_, i) => i !== idx)
+                        setPhotos(next)
+                        setPhotoPreviews(next.map((f) => URL.createObjectURL(f)))
+                      }}
+                      aria-label="Remove photo"
+                    >
+                      ×
+                    </button>
+                  </div>
                 ))}
               </div>
             ) : null}
@@ -233,6 +248,7 @@ export function ReportPage() {
 
           <div>
             <Label>{t('report.voice')}</Label>
+            <p className="text-xs text-vc-muted mb-1.5">Optional — record or upload audio</p>
             <div className="flex flex-wrap gap-2">
               {!recording ? (
                 <Button type="button" variant="secondary" onClick={() => void startRecording()}>
@@ -244,7 +260,11 @@ export function ReportPage() {
                 </Button>
               )}
               <label className="inline-flex">
-                <Button type="button" variant="secondary" as-child={undefined} onClick={() => document.getElementById('voice-upload')?.click()}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => document.getElementById('voice-upload')?.click()}
+                >
                   <Upload className="h-4 w-4" /> {t('report.uploadVoice')}
                 </Button>
                 <input
@@ -255,6 +275,11 @@ export function ReportPage() {
                   onChange={(e) => setVoiceFile(e.target.files?.[0] || null)}
                 />
               </label>
+              {voiceFile ? (
+                <Button type="button" variant="ghost" onClick={() => setVoiceFile(null)}>
+                  Remove audio
+                </Button>
+              ) : null}
             </div>
             {voiceFile ? <p className="text-xs text-vc-teal mt-2">Attached: {voiceFile.name}</p> : null}
           </div>
