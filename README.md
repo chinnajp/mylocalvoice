@@ -14,6 +14,15 @@ npm run dev
 
 Open https://MyLocalVoice.in (or http://localhost:5173 in development)
 
+### Daily workflow (laptop ↔ GitHub ↔ Vercel)
+
+See **[WORKFLOW.md](./WORKFLOW.md)** for the start / finish checklist.
+
+```bash
+npm run sync          # start: pull latest from GitHub
+npm run finish -- "…" # finish: commit + push (Vercel updates)
+```
+
 ### Demo admin login
 
 - Email: `admin@mylocalvoice.in`
@@ -66,6 +75,8 @@ admins/{uid} → { villageId, role }
 
 | Command        | Description        |
 | -------------- | ------------------ |
+| `npm run sync` | Pull latest from GitHub (`main`) |
+| `npm run finish -- "msg"` | Commit all changes and push to GitHub |
 | `npm run dev`  | Development server |
 | `npm run build`| Production build   |
 | `npm run preview` | Preview build   |
