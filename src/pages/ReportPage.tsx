@@ -112,6 +112,7 @@ export function ReportPage() {
 
   const onSubmit = async (data: FormValues) => {
     setError('')
+    if (isSubmitting) return
     if (!data.description.trim()) {
       setError('Please enter a description')
       return

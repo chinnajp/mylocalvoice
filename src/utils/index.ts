@@ -12,6 +12,20 @@ export function generateComplaintId(villageCode: string, sequence: number, year 
   return `${villageCode.toUpperCase()}-${year}-${String(sequence).padStart(5, '0')}`
 }
 
+/** Extract numeric sequence from IDs like TP-2026-00004 → 4 */
+export function parseComplaintSequence(complaintId: string): number {
+  const m = complaintId.trim().match(/-(\d{1,})$/)
+  return m ? Number.parseInt(m[1], 10) : 0
+}
+
+/** Sort by complaint number ascending (TP-2026-00001, 00002, …) */
+export function compareComplaintIdAsc(a: string, b: string) {
+  const sa = parseComplaintSequence(a)
+  const sb = parseComplaintSequence(b)
+  if (sa !== sb) return sa - sb
+  return a.localeCompare(b)
+}
+
 export function formatDate(iso: string, locale = 'en-IN') {
   return new Date(iso).toLocaleDateString(locale, {
     day: 'numeric',

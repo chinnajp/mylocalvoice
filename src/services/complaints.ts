@@ -34,7 +34,7 @@ import {
   mockAnnouncements,
   mockComplaints,
 } from '@/data/mockData'
-import { avgResolutionDays, generateComplaintId, isPendingStatus } from '@/utils'
+import { avgResolutionDays, generateComplaintId, isPendingStatus, parseComplaintSequence, compareComplaintIdAsc } from '@/utils'
 import { canAssignComplaints, canDeleteComplaints, canEditComplaint, canSetStatus } from '@/utils/roles'
 import { auth, db, useMockData } from '@/lib/firebase'
 import { notifyComplaintStatus } from '@/services/notifications'
@@ -155,16 +155,27 @@ async function findComplaintLive(
   return { ref: match.ref, complaint: docToComplaint(match.id, match.data()) }
 }
 
-async function nextComplaintSequence(villageId: string): Promise<number> {
+async function nextComplaintSequence(villageId: string, floor = 0): Promise<number> {
   const firestore = requireDb()
   const counterRef = doc(firestore, 'villages', villageId, 'meta', 'counters')
   return runTransaction(firestore, async (tx) => {
     const snap = await tx.get(counterRef)
-    const next = (snap.data()?.complaintSeq as number | undefined) ?? 0
-    const value = next + 1
+    const stored = (snap.data()?.complaintSeq as number | undefined) ?? 0
+    const value = Math.max(stored, floor) + 1
     tx.set(counterRef, { complaintSeq: value }, { merge: true })
     return value
   })
+}
+
+/** Highest numeric ID already stored (so new IDs continue in order: 1,2,3…) */
+async function maxExistingComplaintSeq(villageId: string): Promise<number> {
+  const snap = await getDocs(complaintsCol(villageId))
+  let max = 0
+  snap.docs.forEach((d) => {
+    const n = parseComplaintSequence(String(d.data().complaintId || ''))
+    if (n > max) max = n
+  })
+  return max
 }
 
 async function appendActivityLive(
@@ -220,7 +231,7 @@ function filterComplaints(
         CATEGORY_LABELS[c.category].toLowerCase().includes(q),
     )
   }
-  return result.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
+  return result.sort((a, b) => compareComplaintIdAsc(a.complaintId, b.complaintId))
 }
 
 function buildDashboardStats(list: Complaint[]): DashboardStats {
@@ -283,11 +294,13 @@ export async function getComplaints(villageId: string = DEFAULT_VILLAGE.id): Pro
     await delay()
     return complaintsStore
       .filter((c) => c.villageId === villageId)
-      .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
+      .sort((a, b) => compareComplaintIdAsc(a.complaintId, b.complaintId))
   }
 
   const snap = await getDocs(query(complaintsCol(villageId), orderBy('createdAt', 'desc')))
-  return snap.docs.map((d) => docToComplaint(d.id, d.data()))
+  return snap.docs
+    .map((d) => docToComplaint(d.id, d.data()))
+    .sort((a, b) => compareComplaintIdAsc(a.complaintId, b.complaintId))
 }
 
 export async function getComplaintById(
@@ -380,16 +393,18 @@ export async function createComplaint(form: ReportIssueForm, villageId: string =
     return complaint
   }
 
+  // Upload first so failed uploads don't burn complaint numbers
   const docRef = doc(complaintsCol(villageId))
-  const seq = await nextComplaintSequence(villageId)
-  const complaintId = generateComplaintId(DEFAULT_VILLAGE.code, seq)
-
   const { photoUrls, voiceUrl } = await uploadComplaintMedia(
     villageId,
     docRef.id,
     form.photos,
     form.voiceFile,
   )
+
+  const floor = await maxExistingComplaintSeq(villageId)
+  const seq = await nextComplaintSequence(villageId, floor)
+  const complaintId = generateComplaintId(DEFAULT_VILLAGE.code, seq)
 
   const complaint: Complaint = {
     id: docRef.id,
