@@ -1,4 +1,4 @@
-import { Navigate, useNavigate, Link } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, TreePine } from 'lucide-react'
@@ -112,12 +112,6 @@ export function CitizenLoginPage() {
             {t('login.continue')}
           </button>
         </div>
-
-        <p className="text-center text-xs text-emerald-700/60 mt-8">
-          <Link to="/admin/login" className="underline underline-offset-2">
-            {t('nav.admin')}
-          </Link>
-        </p>
       </form>
     </div>
   )

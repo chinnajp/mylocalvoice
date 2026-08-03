@@ -98,11 +98,6 @@ export function PublicLayout() {
             >
               {t('nav.logout')}
             </Button>
-            <Link to="/admin" className="hidden lg:block">
-              <Button variant="outline" size="sm">
-                {t('nav.admin')}
-              </Button>
-            </Link>
             <button
               type="button"
               className="md:hidden p-2 text-vc-muted"
@@ -136,9 +131,6 @@ export function PublicLayout() {
             >
               {t('nav.logout')}
             </button>
-            <Link to="/admin" onClick={() => setOpen(false)} className="block px-3 py-2.5 text-sm text-vc-accent">
-              {t('nav.admin')}
-            </Link>
           </nav>
         ) : null}
       </header>
