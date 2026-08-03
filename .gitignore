@@ -40,4 +40,3 @@ serviceAccount.json
 *-firebase-adminsdk-*.json
 
 .vercel
-.env*
