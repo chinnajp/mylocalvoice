@@ -52,21 +52,28 @@ npm run finish -- "…" # finish: commit + push (Vercel updates)
 
 IDs look like `TP-2026-00001`.
 
-## Firebase setup
+## Firebase setup (required for live complaints)
 
-1. Copy `.env.example` to `.env`
-2. Fill Firebase + Google Maps keys
-3. Set `VITE_USE_MOCK_DATA=false`
+See **[FIREBASE_SETUP.md](./FIREBASE_SETUP.md)** for emulator (local) and cloud steps.
 
-Firestore structure supports multiple villages:
+Quick local start:
 
-```
-villages/{villageId}/complaints
-villages/{villageId}/announcements
-villages/{villageId}/activityLog
-admins/{uid} → { villageId, role }
+```bash
+npm run emulators      # terminal 1
+npm run seed:admin     # terminal 2
+npm run dev            # terminal 2
 ```
 
+Without Firebase, the app can still run in mock mode (`VITE_USE_MOCK_DATA=true`) — data stays in browser memory only.
+
+Firestore layout:
+
+```
+villages/{villageId}/complaints/{id}
+villages/{villageId}/activityLog/{id}
+villages/{villageId}/meta/counters
+admins/{uid} → { villageId, role, displayName, email }
+```
 ## Notifications architecture
 
 `src/services/notifications.ts` defines SMS, WhatsApp, Email, and Push providers (console stubs). Swap in Twilio / MSG91 / Meta / SendGrid / FCM and trigger from Cloud Functions on status change.

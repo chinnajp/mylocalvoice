@@ -10,7 +10,7 @@ import {
 import i18n from '@/i18n'
 import { DEFAULT_VILLAGE } from '@/constants'
 import type { AdminUser, CitizenUser, VillageConfig } from '@/types'
-import { loginAdmin } from '@/services/complaints'
+import { loginAdmin, logoutAdminSession } from '@/services/complaints'
 
 export type AppLanguage = 'en' | 'ta'
 
@@ -126,6 +126,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const logoutAdmin = useCallback(() => {
     setAdmin(null)
     localStorage.removeItem('vc-admin')
+    void logoutAdminSession()
   }, [])
 
   const value = useMemo(

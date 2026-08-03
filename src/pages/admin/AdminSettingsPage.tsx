@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Card, PageTitle } from '@/components/ui'
 import { useApp } from '@/contexts/AppContext'
-import { useMockData } from '@/lib/firebase'
+import { useMockData, useEmulator } from '@/lib/firebase'
 import { roleLabel } from '@/utils/roles'
 
 export function AdminSettingsPage() {
@@ -58,10 +58,29 @@ export function AdminSettingsPage() {
       <Card className="space-y-3">
         <h2 className="label-caps">Integrations</h2>
         <ul className="text-sm text-vc-muted space-y-2">
-          <li>Data mode: {useMockData ? 'Mock (local demo)' : 'Firebase live'}</li>
+          <li>
+            Data mode:{' '}
+            <span className={useMockData ? 'text-amber-400' : 'text-emerald-400'}>
+              {useMockData
+                ? 'Mock (local demo)'
+                : useEmulator
+                  ? 'Firebase live (emulator)'
+                  : 'Firebase live (cloud)'}
+            </span>
+          </li>
+          {useMockData ? (
+            <li className="text-amber-400/90">
+              Complaints are not saved to a database. See FIREBASE_SETUP.md — run emulators or add
+              cloud keys, set VITE_USE_MOCK_DATA=false, restart the app.
+            </li>
+          ) : (
+            <li className="text-emerald-400/90">
+              Public reports are stored in Firestore and appear under All Complaints
+              {useEmulator ? ' (local emulator — start with npm run emulators)' : ''}.
+            </li>
+          )}
           <li>Notifications: SMS / WhatsApp / Email / Push providers stubbed in services/notifications.ts</li>
           <li>Maps: set VITE_GOOGLE_MAPS_API_KEY for live Google Maps</li>
-          <li>Copy .env.example → .env and fill Firebase credentials for production</li>
         </ul>
       </Card>
     </div>

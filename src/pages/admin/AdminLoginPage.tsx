@@ -6,6 +6,7 @@ import { TreePine } from 'lucide-react'
 import { Button, Card, Input, Label, Spinner } from '@/components/ui'
 import { useApp } from '@/contexts/AppContext'
 import { DEMO_ADMIN, DEMO_STAFF_MEMBERS } from '@/data/mockData'
+import { useMockData, useEmulator } from '@/lib/firebase'
 
 interface LoginForm {
   email: string
@@ -73,7 +74,15 @@ export function AdminLoginPage() {
         </form>
 
         <div className="mt-5 space-y-2 text-xs text-vc-muted">
-          <p className="label-caps">Demo accounts</p>
+          <p className="label-caps">
+            {useMockData ? 'Demo accounts (mock)' : useEmulator ? 'Seeded accounts (emulator)' : 'Admin accounts'}
+          </p>
+          {!useMockData && useEmulator ? (
+            <p className="text-[10px] opacity-80">
+              Run <code className="text-sky-400">npm run seed:admin</code> once while emulators are
+              running.
+            </p>
+          ) : null}
           <button
             type="button"
             className="w-full text-left rounded-xl border border-vc-border px-3 py-2 hover:border-sky-500/40"

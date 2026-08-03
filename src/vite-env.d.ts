@@ -10,6 +10,7 @@ interface ImportMetaEnv {
   readonly VITE_GOOGLE_MAPS_API_KEY: string
   readonly VITE_VILLAGE_ID: string
   readonly VITE_USE_MOCK_DATA: string
+  readonly VITE_USE_FIREBASE_EMULATOR: string
 }
 
 interface ImportMeta {

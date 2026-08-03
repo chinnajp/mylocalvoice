@@ -117,16 +117,19 @@ export function ReportPage() {
       return
     }
     try {
-      const complaint = await createComplaint({
-        fullName: data.fullName || undefined,
-        mobile: data.mobile || undefined,
-        category: data.category,
-        description: data.description,
-        areaId: data.areaId,
-        location,
-        photos,
-        voiceFile,
-      })
+      const complaint = await createComplaint(
+        {
+          fullName: data.fullName || undefined,
+          mobile: data.mobile || undefined,
+          category: data.category,
+          description: data.description,
+          areaId: data.areaId,
+          location,
+          photos,
+          voiceFile,
+        },
+        village.id,
+      )
       navigate(`/complaints/${complaint.complaintId}`, { state: { justSubmitted: true } })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Submission failed')
