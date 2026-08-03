@@ -1,12 +1,8 @@
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { storage } from '@/lib/firebase'
 
-function requireStorage() {
-  if (!storage) {
-    throw new Error('Firebase Storage is not configured. Check your .env Firebase keys.')
-  }
-  return storage
-}
+const STORAGE_TIMEOUT_MS = 8000
+const MAX_EMBED_CHARS = 700_000
 
 function guessContentType(file: File, kind: 'image' | 'audio'): string {
   if (file.type && file.type !== 'application/octet-stream') return file.type
@@ -23,9 +19,26 @@ function guessContentType(file: File, kind: 'image' | 'audio'): string {
   return 'audio/webm'
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`${label} timed out`)), ms)
+    promise.then(
+      (v) => {
+        clearTimeout(timer)
+        resolve(v)
+      },
+      (e) => {
+        clearTimeout(timer)
+        reject(e)
+      },
+    )
+  })
+}
+
 async function uploadOne(path: string, file: File, kind: 'image' | 'audio'): Promise<string> {
+  if (!storage) throw new Error('Storage unavailable')
   const contentType = guessContentType(file, kind)
-  const storageRef = ref(requireStorage(), path)
+  const storageRef = ref(storage, path)
   await uploadBytes(storageRef, file, { contentType })
   return getDownloadURL(storageRef)
 }
@@ -39,75 +52,132 @@ function readAsDataUrl(file: File): Promise<string> {
   })
 }
 
-/** Compress image for Firestore fallback (keeps docs under size limits). */
-async function imageToCompressedDataUrl(file: File, maxEdge = 1280, quality = 0.72): Promise<string> {
-  if (typeof createImageBitmap === 'undefined') {
-    return readAsDataUrl(file)
+async function imageToCompressedDataUrl(file: File, maxEdge = 960, quality = 0.55): Promise<string> {
+  try {
+    if (typeof createImageBitmap === 'undefined') {
+      return readAsDataUrl(file)
+    }
+    const bitmap = await createImageBitmap(file)
+    const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height))
+    const w = Math.max(1, Math.round(bitmap.width * scale))
+    const h = Math.max(1, Math.round(bitmap.height * scale))
+    const canvas = document.createElement('canvas')
+    canvas.width = w
+    canvas.height = h
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      bitmap.close()
+      return readAsDataUrl(file)
+    }
+    ctx.drawImage(bitmap, 0, 0, w, h)
+    bitmap.close()
+    return canvas.toDataURL('image/jpeg', quality)
+  } catch {
+    try {
+      return await readAsDataUrl(file)
+    } catch {
+      return ''
+    }
   }
-  const bitmap = await createImageBitmap(file)
-  const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height))
-  const w = Math.max(1, Math.round(bitmap.width * scale))
-  const h = Math.max(1, Math.round(bitmap.height * scale))
-  const canvas = document.createElement('canvas')
-  canvas.width = w
-  canvas.height = h
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return readAsDataUrl(file)
-  ctx.drawImage(bitmap, 0, 0, w, h)
-  bitmap.close()
-  return canvas.toDataURL('image/jpeg', quality)
 }
 
-async function fallbackLocalMedia(
+async function embedLocalMedia(
   photos: File[],
   voiceFile?: File | null,
 ): Promise<{ photoUrls: string[]; voiceUrl?: string }> {
-  // Firestore doc size limit ~1MB — keep fallback media small
-  const limitedPhotos = photos.slice(0, 3)
-  const photoUrls = await Promise.all(
-    limitedPhotos.map((f) => imageToCompressedDataUrl(f, 1024, 0.65)),
-  )
-  let voiceUrl: string | undefined
-  if (voiceFile && voiceFile.size <= 400_000) {
-    voiceUrl = await readAsDataUrl(voiceFile)
+  const photoUrls: string[] = []
+  for (const file of photos.slice(0, 2)) {
+    const url = await imageToCompressedDataUrl(file)
+    if (!url) continue
+    const nextSize = photoUrls.join('').length + url.length
+    if (nextSize > MAX_EMBED_CHARS) break
+    photoUrls.push(url)
   }
+
+  let voiceUrl: string | undefined
+  if (voiceFile && voiceFile.size <= 250_000) {
+    try {
+      const data = await readAsDataUrl(voiceFile)
+      if (photoUrls.join('').length + data.length <= MAX_EMBED_CHARS) {
+        voiceUrl = data
+      }
+    } catch {
+      // skip voice
+    }
+  }
+
   return { photoUrls, voiceUrl }
 }
 
-/** Upload complaint photos/voice to Firebase Storage; falls back to data URLs if Storage is blocked. */
-export async function uploadComplaintMedia(
+async function tryFirebaseStorage(
   villageId: string,
   complaintDocId: string,
   photos: File[],
   voiceFile?: File | null,
 ): Promise<{ photoUrls: string[]; voiceUrl?: string }> {
+  if (!storage) throw new Error('no storage')
+  const base = `villages/${villageId}/complaints/${complaintDocId}`
+
+  const photoUrls = await Promise.all(
+    photos.slice(0, 6).map((file, i) => {
+      const ext = file.name.includes('.') ? file.name.split('.').pop() : 'jpg'
+      return uploadOne(`${base}/photos/${Date.now()}_${i}.${ext}`, file, 'image')
+    }),
+  )
+
+  let voiceUrl: string | undefined
+  if (voiceFile) {
+    const ext = voiceFile.name.includes('.') ? voiceFile.name.split('.').pop() : 'webm'
+    voiceUrl = await uploadOne(`${base}/voice/${Date.now()}.${ext}`, voiceFile, 'audio')
+  }
+
+  return { photoUrls, voiceUrl }
+}
+
+/**
+ * Attach photos/voice for a complaint.
+ * Never throws — if Storage is down, embeds small compressed media (or skips media).
+ */
+export async function uploadComplaintMedia(
+  villageId: string,
+  complaintDocId: string,
+  photos: File[],
+  voiceFile?: File | null,
+): Promise<{ photoUrls: string[]; voiceUrl?: string; mediaWarning?: string }> {
   if ((!photos || photos.length === 0) && !voiceFile) {
     return { photoUrls: [] }
   }
 
-  if (!storage) {
-    return fallbackLocalMedia(photos, voiceFile)
+  // Storage is optional until bucket/rules are enabled on Firebase.
+  // Default: embed compressed media so submit never hangs on Storage.
+  const useStorage = import.meta.env.VITE_USE_FIREBASE_STORAGE === 'true'
+
+  if (useStorage && storage) {
+    try {
+      return await withTimeout(
+        tryFirebaseStorage(villageId, complaintDocId, photos, voiceFile),
+        STORAGE_TIMEOUT_MS,
+        'Storage upload',
+      )
+    } catch {
+      // fall through to embed / skip
+    }
   }
 
-  const base = `villages/${villageId}/complaints/${complaintDocId}`
-
   try {
-    const photoUrls = await Promise.all(
-      photos.map((file, i) => {
-        const ext = file.name.includes('.') ? file.name.split('.').pop() : 'jpg'
-        return uploadOne(`${base}/photos/${Date.now()}_${i}.${ext}`, file, 'image')
-      }),
-    )
-
-    let voiceUrl: string | undefined
-    if (voiceFile) {
-      const ext = voiceFile.name.includes('.') ? voiceFile.name.split('.').pop() : 'webm'
-      voiceUrl = await uploadOne(`${base}/voice/${Date.now()}.${ext}`, voiceFile, 'audio')
+    const embedded = await embedLocalMedia(photos, voiceFile)
+    if (embedded.photoUrls.length > 0 || embedded.voiceUrl) {
+      return {
+        ...embedded,
+        mediaWarning: 'Saved with compressed photos (cloud Storage not ready).',
+      }
     }
-
-    return { photoUrls, voiceUrl }
   } catch {
-    // Storage rules / bucket not ready — still allow complaint submit with embedded media
-    return fallbackLocalMedia(photos, voiceFile)
+    // ignore
+  }
+
+  return {
+    photoUrls: [],
+    mediaWarning: 'Could not attach media — complaint was still submitted.',
   }
 }

@@ -131,7 +131,12 @@ export function ReportPage() {
         },
         village.id,
       )
-      navigate(`/complaints/${complaint.complaintId}`, { state: { justSubmitted: true } })
+      navigate(`/complaints/${complaint.complaintId}`, {
+        state: {
+          justSubmitted: true,
+          mediaWarning: (complaint as Complaint & { mediaWarning?: string }).mediaWarning,
+        },
+      })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Submission failed')
     }

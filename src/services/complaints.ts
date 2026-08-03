@@ -393,14 +393,19 @@ export async function createComplaint(form: ReportIssueForm, villageId: string =
     return complaint
   }
 
-  // Upload first so failed uploads don't burn complaint numbers
+  // Media must never block complaint creation
   const docRef = doc(complaintsCol(villageId))
-  const { photoUrls, voiceUrl } = await uploadComplaintMedia(
-    villageId,
-    docRef.id,
-    form.photos,
-    form.voiceFile,
-  )
+  let photoUrls: string[] = []
+  let voiceUrl: string | undefined
+  let mediaWarning: string | undefined
+  try {
+    const media = await uploadComplaintMedia(villageId, docRef.id, form.photos, form.voiceFile)
+    photoUrls = media.photoUrls
+    voiceUrl = media.voiceUrl
+    mediaWarning = media.mediaWarning
+  } catch {
+    mediaWarning = 'Could not attach media — complaint was still submitted.'
+  }
 
   const floor = await maxExistingComplaintSeq(villageId)
   const seq = await nextComplaintSequence(villageId, floor)
@@ -457,7 +462,7 @@ export async function createComplaint(form: ReportIssueForm, villageId: string =
     await notifyComplaintStatus(form.mobile, undefined, complaintId, STATUS_LABELS.submitted)
   }
 
-  return complaint
+  return { ...complaint, mediaWarning } as Complaint & { mediaWarning?: string }
 }
 
 export async function upvoteComplaint(id: string, voterKey: string) {
