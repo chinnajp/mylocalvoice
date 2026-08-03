@@ -39,3 +39,5 @@ ui-debug.log
 serviceAccount.json
 *-firebase-adminsdk-*.json
 
+.vercel
+.env*
