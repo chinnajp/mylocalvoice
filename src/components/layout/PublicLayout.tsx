@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Home,
@@ -12,6 +12,7 @@ import {
   Menu,
   X,
   TreePine,
+  LogOut,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useApp } from '@/contexts/AppContext'
@@ -28,11 +29,18 @@ const links = [
 
 export function PublicLayout() {
   const { t } = useTranslation()
-  const { village, theme, toggleTheme, language, setLanguage, logoutCitizen } = useApp()
+  const navigate = useNavigate()
+  const { village, theme, toggleTheme, language, setLanguage, citizen, logoutCitizen } = useApp()
   const [open, setOpen] = useState(false)
 
   const toggleLang = () => {
     setLanguage(language === 'ta' ? 'en' : 'ta', true)
+  }
+
+  const signOut = () => {
+    setOpen(false)
+    logoutCitizen()
+    navigate('/login', { replace: true })
   }
 
   return (
@@ -90,14 +98,25 @@ export function PublicLayout() {
             >
               {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden lg:inline-flex"
-              onClick={() => logoutCitizen()}
-            >
-              {t('nav.logout')}
-            </Button>
+            {citizen ? (
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div className="min-w-0 text-right hidden xs:block sm:block">
+                  <p className="text-[11px] sm:text-sm text-vc-muted truncate max-w-[100px] sm:max-w-[160px]">
+                    {citizen.fullName}
+                  </p>
+                  <p className="text-[10px] text-vc-accent truncate">{citizen.mobile}</p>
+                </div>
+                <Button
+                  variant="accent"
+                  size="sm"
+                  className="shrink-0 px-2.5 sm:px-4"
+                  onClick={signOut}
+                >
+                  <LogOut className="h-4 w-4 sm:hidden" />
+                  <span className="hidden sm:inline">{t('nav.logout')}</span>
+                </Button>
+              </div>
+            ) : null}
             <button
               type="button"
               className="md:hidden p-2 text-vc-muted"
@@ -121,16 +140,14 @@ export function PublicLayout() {
                 {t(labelKey)}
               </NavLink>
             ))}
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false)
-                logoutCitizen()
-              }}
-              className="block w-full text-left px-3 py-2.5 text-sm text-vc-muted"
-            >
-              {t('nav.logout')}
-            </button>
+            {citizen ? (
+              <div className="pt-2 border-t dark:border-vc-border border-light-border mt-2">
+                <p className="px-3 py-1 text-xs text-vc-muted truncate">{citizen.fullName}</p>
+                <Button variant="accent" className="w-full mt-1" onClick={signOut}>
+                  <LogOut className="h-4 w-4" /> {t('nav.logout')}
+                </Button>
+              </div>
+            ) : null}
           </nav>
         ) : null}
       </header>
