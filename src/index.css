@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "DM Sans", "Noto Sans Tamil", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", "Catamaran", "Noto Sans Tamil", "DM Sans", ui-sans-serif, sans-serif;
+  --font-tamil: "Noto Sans Tamil", "Catamaran", "DM Sans", ui-sans-serif, sans-serif;
+  --font-tamil-display: "Catamaran", "Noto Sans Tamil", "Outfit", ui-sans-serif, sans-serif;
+
+  --color-vc-bg: #0d1117;
+  --color-vc-surface: #151b24;
+  --color-vc-card: #1a2230;
+  --color-vc-border: #243044;
+  --color-vc-muted: #8b9cb3;
+  --color-vc-text: #f0f4f8;
+  --color-vc-accent: #f59e0b;
+  --color-vc-accent-glow: rgba(245, 158, 11, 0.35);
+  --color-vc-primary: #38bdf8;
+  --color-vc-teal: #2dd4bf;
+  --color-vc-success: #22c55e;
+  --color-vc-warning: #eab308;
+  --color-vc-danger: #ef4444;
+  --color-vc-info: #3b82f6;
+
+  --color-light-bg: #f0f7f4;
+  --color-light-surface: #ffffff;
+  --color-light-card: #ffffff;
+  --color-light-border: #d4e5dc;
+  --color-light-muted: #5a7a6a;
+  --color-light-text: #0f2e22;
+  --color-light-primary: #0d9488;
+  --color-light-accent: #0369a1;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  /* Tamil UI: proper glyphs, spacing, and readable sizes */
+  html[lang='ta'] body,
+  html.lang-ta body {
+    font-family: var(--font-tamil);
+    line-height: 1.65;
+    letter-spacing: 0.01em;
+    font-size: 16.5px;
+  }
+
+  html[lang='ta'] .font-display,
+  html.lang-ta .font-display {
+    font-family: var(--font-tamil-display);
+    line-height: 1.35;
+    letter-spacing: 0.015em;
+    word-break: keep-all;
+  }
+
+  html[lang='ta'] .label-caps,
+  html.lang-ta .label-caps {
+    letter-spacing: 0.06em;
+    font-size: 0.72rem;
+  }
+
+  html[lang='ta'] nav a,
+  html.lang-ta nav a {
+    font-size: 0.9rem;
+    line-height: 1.35;
+  }
+
+  .dark body,
+  body.dark-theme {
+    background: var(--color-vc-bg);
+    color: var(--color-vc-text);
+  }
+
+  .light body,
+  body:not(.dark-theme) {
+    background: var(--color-light-bg);
+    color: var(--color-light-text);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .gradient-submit {
+    background: linear-gradient(90deg, #38bdf8 0%, #2dd4bf 100%);
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 0 1px var(--color-vc-accent), 0 0 16px var(--color-vc-accent-glow);
+  }
+
+  /* Sidebar idle → hover/active (reference: orange rounded frame + soft glow) */
+  .sidebar-nav-item {
+    outline: none;
+  }
+
+  .sidebar-nav-item:focus-visible {
+    box-shadow: 0 0 0 1px var(--color-vc-accent), 0 0 14px var(--color-vc-accent-glow);
+  }
+
+  .card-dark {
+    background: var(--color-vc-card);
+    border: 1px solid var(--color-vc-border);
+    border-radius: 1rem;
+  }
+
+  .input-dark {
+    background: var(--color-vc-bg);
+    border: 1px solid var(--color-vc-border);
+    color: var(--color-vc-text);
+    border-radius: 0.75rem;
+  }
+
+  .input-dark:focus {
+    outline: none;
+    border-color: var(--color-vc-primary);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+  }
+
+  .label-caps {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-vc-muted);
+  }
+}
