@@ -259,14 +259,48 @@ export function AdminComplaintManagePage() {
       <Card className="mb-4">
         <h2 className="label-caps mb-2">Description</h2>
         <p className="text-sm text-slate-300 mb-4">{complaint.description}</p>
-        <h2 className="label-caps mb-2">Before / After Photos</h2>
+
+        <h2 className="label-caps mb-2">Citizen photos</h2>
+        {complaint.photos.length > 0 ? (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {complaint.photos.map((src) => (
+              <a key={src} href={src} target="_blank" rel="noreferrer" className="block">
+                <img
+                  src={src}
+                  alt="Citizen upload"
+                  className="h-28 w-36 object-cover rounded-lg border border-vc-border hover:opacity-90"
+                />
+              </a>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-vc-muted mb-4">No photos attached by citizen.</p>
+        )}
+
+        <h2 className="label-caps mb-2">Citizen voice / audio</h2>
+        {complaint.voiceUrl ? (
+          <audio controls src={complaint.voiceUrl} className="w-full mb-4" />
+        ) : (
+          <p className="text-xs text-vc-muted mb-4">No audio attached by citizen.</p>
+        )}
+
+        <h2 className="label-caps mb-2">Before / After (staff)</h2>
         <p className="text-xs text-vc-muted mb-2">
-          Upload via Firebase Storage in production. Demo shows existing URLs.
+          Work evidence photos (before/after) when available.
         </p>
         <div className="flex flex-wrap gap-2">
-          {[...complaint.beforePhotos, ...complaint.afterPhotos, ...complaint.photos].map((src) => (
-            <img key={src} src={src} alt="" className="h-20 w-28 object-cover rounded-lg border border-vc-border" />
-          ))}
+          {[...complaint.beforePhotos, ...complaint.afterPhotos].length > 0 ? (
+            [...complaint.beforePhotos, ...complaint.afterPhotos].map((src) => (
+              <img
+                key={src}
+                src={src}
+                alt=""
+                className="h-20 w-28 object-cover rounded-lg border border-vc-border"
+              />
+            ))
+          ) : (
+            <p className="text-xs text-vc-muted">No before/after photos yet.</p>
+          )}
         </div>
       </Card>
 
