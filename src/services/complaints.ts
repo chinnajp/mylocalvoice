@@ -68,9 +68,24 @@ function requireAuth() {
   return auth
 }
 
-/** Firestore rejects `undefined` field values */
+/** Firestore rejects `undefined` field values (including nested). */
+function stripUndefined(value: unknown): unknown {
+  if (value === undefined) return undefined
+  if (value === null || typeof value !== 'object') return value
+  if (Array.isArray(value)) {
+    return value.map((item) => stripUndefined(item)).filter((item) => item !== undefined)
+  }
+  const out: Record<string, unknown> = {}
+  for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+    if (v === undefined) continue
+    const cleaned = stripUndefined(v)
+    if (cleaned !== undefined) out[k] = cleaned
+  }
+  return out
+}
+
 function omitUndefined<T extends Record<string, unknown>>(obj: T): T {
-  return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined)) as T
+  return stripUndefined(obj) as T
 }
 
 function complaintsCol(villageId: string) {
@@ -533,7 +548,7 @@ export async function updateComplaintStatus(
       id: `t_${Date.now()}`,
       status,
       title: `Status updated to ${STATUS_LABELS[status]}`,
-      description: note,
+      ...(note ? { description: note } : {}),
       createdAt: now,
       createdBy: actor,
     })
@@ -573,17 +588,15 @@ export async function updateComplaintStatus(
   }
 
   const now = new Date().toISOString()
-  const timeline = [
-    ...c.timeline,
-    {
-      id: `t_${Date.now()}`,
-      status,
-      title: `Status updated to ${STATUS_LABELS[status]}`,
-      description: note,
-      createdAt: now,
-      createdBy: actor,
-    },
-  ]
+  const timelineEvent = {
+    id: `t_${Date.now()}`,
+    status,
+    title: `Status updated to ${STATUS_LABELS[status]}`,
+    ...(note ? { description: note } : {}),
+    createdAt: now,
+    createdBy: actor,
+  }
+  const timeline = [...c.timeline, timelineEvent]
   const adminNotes = note
     ? [
         ...c.adminNotes,
@@ -608,7 +621,7 @@ export async function updateComplaintStatus(
   }
   if (status === 'resolved') patch.resolvedAt = now
 
-  await updateDoc(found.ref, patch)
+  await updateDoc(found.ref, omitUndefined(patch))
   await appendActivityLive(c.villageId, {
     action: 'status_update',
     details: `${c.complaintId} → ${STATUS_LABELS[status]}`,
