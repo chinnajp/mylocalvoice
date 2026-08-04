@@ -74,7 +74,7 @@ const resources = {
         profile: 'Profile',
         admin: 'Admin',
         announcements: 'Announcements',
-        logout: 'Log out',
+        logout: 'Sign out',
       },
       home: {
         heroTitle: 'Your voice for a better village',

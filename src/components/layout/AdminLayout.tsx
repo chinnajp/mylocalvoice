@@ -10,7 +10,6 @@ import {
   TreePine,
   Menu,
   X,
-  LogOut,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useApp } from '@/contexts/AppContext'
@@ -210,8 +209,12 @@ export function AdminLayout() {
           <NavSections onNavigate={() => setMobileOpen(false)} />
         </div>
         <div className="p-3 border-t border-vc-border">
-          <Button variant="danger" className="w-full" onClick={signOut}>
-            <LogOut className="h-4 w-4" /> {t('admin.signOut')}
+          <Button
+            variant="accent"
+            className="w-full rounded-full py-2.5 font-semibold text-white shadow-md shadow-amber-500/30 hover:brightness-110"
+            onClick={signOut}
+          >
+            {t('admin.signOut')}
           </Button>
         </div>
       </aside>
@@ -244,11 +247,10 @@ export function AdminLayout() {
             <Button
               variant="accent"
               size="sm"
-              className="shrink-0 px-2.5 sm:px-4"
+              className="shrink-0 rounded-full px-5 sm:px-6 py-2 text-sm font-semibold text-white shadow-md shadow-amber-500/30 hover:brightness-110 hover:shadow-lg hover:shadow-amber-500/40"
               onClick={signOut}
             >
-              <LogOut className="h-4 w-4 sm:hidden" />
-              <span className="hidden sm:inline">{t('admin.signOut')}</span>
+              {t('admin.signOut')}
             </Button>
           </div>
         </header>
