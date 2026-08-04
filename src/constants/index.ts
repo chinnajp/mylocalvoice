@@ -85,7 +85,7 @@ export const CATEGORY_LABELS_TA: Record<ComplaintCategory, string> = {
   other: 'மற்றவை',
 }
 
-/** Villages / areas under Thiruppair Panchayat (Poondi Ondiyam) */
+/** Habitations under Thiruppair Village Panchayat (Poondi Block) */
 export const VILLAGE_AREAS = [
   {
     id: 'thiruppair',
@@ -95,11 +95,39 @@ export const VILLAGE_AREAS = [
     lng: 79.8342263,
   },
   {
-    id: 'thiruppair-kaalani',
-    name: 'Thiruppair Kaalani',
+    id: 'thiruppair-colony',
+    name: 'Thiruppair Colony',
     nameTa: 'திருப்பைர் காலனி',
     lat: 13.2112,
     lng: 79.8358,
+  },
+  {
+    id: 'thiruppair-st-colony',
+    name: 'Thiruppair ST Colony',
+    nameTa: 'திருப்பைர் எஸ்.டி. காலனி',
+    lat: 13.2104,
+    lng: 79.8364,
+  },
+  {
+    id: 'arumbakkam',
+    name: 'Arumbakkam',
+    nameTa: 'அரும்பாக்கம்',
+    lat: 13.2065,
+    lng: 79.8365,
+  },
+  {
+    id: 'arumbakkam-colony',
+    name: 'Arumbakkam Colony',
+    nameTa: 'அரும்பாக்கம் காலனி',
+    lat: 13.2058,
+    lng: 79.8372,
+  },
+  {
+    id: 'arumbakkam-st-colony',
+    name: 'Arumbakkam ST Colony',
+    nameTa: 'அரும்பாக்கம் எஸ்.டி. காலனி',
+    lat: 13.2052,
+    lng: 79.8378,
   },
   {
     id: 'bangarampettai',
@@ -109,18 +137,18 @@ export const VILLAGE_AREAS = [
     lng: 79.8315,
   },
   {
-    id: 'parikulam',
-    name: 'Parikulam',
-    nameTa: 'பரிக்குளம்',
+    id: 'parigulam',
+    name: 'Parigulam',
+    nameTa: 'பரிகுளம்',
     lat: 13.2125,
     lng: 79.8322,
   },
   {
-    id: 'arumbakkam',
-    name: 'Arumbakkam',
-    nameTa: 'அரும்பாக்கம்',
-    lat: 13.2065,
-    lng: 79.8365,
+    id: 'irular-colony',
+    name: 'Irular Colony',
+    nameTa: 'இருளர் காலனி',
+    lat: 13.2088,
+    lng: 79.8332,
   },
 ] as const
 
@@ -133,19 +161,21 @@ export type AssignableStaff = (typeof ASSIGNABLE_STAFF)[number]
 export const SITE_DOMAIN = 'MyLocalVoice.in'
 export const SITE_URL = 'https://mylocalvoice.in'
 
-/** Thiruppair Panchayat — Poondi Ondiyam */
+/** Thiruppair Village Panchayat — Poondi Block, Thiruvallur */
 export const DEFAULT_VILLAGE = {
   id: 'thiruppair',
   name: 'Thiruppair',
   nameTa: 'திருப்பைர்',
-  panchayat: 'Thiruppair Panchayat',
-  panchayatTa: 'திருப்பைர் பஞ்சாயத்து',
-  block: 'Poondi Ondiyam',
+  panchayat: 'Thiruppair Village Panchayat',
+  panchayatTa: 'திருப்பைர் கிராம பஞ்சாயத்து',
+  block: 'Poondi',
   blockTa: 'பூண்டி ஒன்றியம்',
+  taluk: 'Thiruvallur',
+  talukTa: 'திருவள்ளூர்',
   code: 'TP',
   logo: '/favicon.svg',
   state: 'Tamil Nadu',
-  district: 'Tiruvallur',
+  district: 'Thiruvallur',
   pincode: '602023',
   center: { lat: 13.2094057, lng: 79.8342263 },
   mapsUrl:
@@ -155,7 +185,8 @@ export const DEFAULT_VILLAGE = {
   contact: {
     phone: '+91 8973697348',
     email: 'panchayat@thiruppair.gov.in',
-    address: 'Panchayat Office, Thiruppair, Poondi Ondiyam, Tiruvallur - 602023',
+    address:
+      'Panchayat Office, Thiruppair Village Panchayat, Poondi Block, Thiruvallur Taluk, Thiruvallur District - 602023',
     president: 'Shri. J.Prasanth',
     hours: 'Mon–Sat 9:00 AM – 5:00 PM',
   },

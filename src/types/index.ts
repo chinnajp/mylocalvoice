@@ -84,6 +84,8 @@ export interface VillageConfig {
   panchayatTa?: string
   block?: string
   blockTa?: string
+  taluk?: string
+  talukTa?: string
   code: string
   logo: string
   state: string

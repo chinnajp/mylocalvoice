@@ -22,9 +22,25 @@ export function AdminSettingsPage() {
             <dt className="text-vc-muted">Code</dt>
             <dd className="font-medium">{village.code}</dd>
           </div>
+          <div className="col-span-2">
+            <dt className="text-vc-muted">Village Panchayat</dt>
+            <dd className="font-medium">{village.panchayat || village.name}</dd>
+          </div>
+          <div>
+            <dt className="text-vc-muted">Block</dt>
+            <dd className="font-medium">{village.block || '—'}</dd>
+          </div>
+          <div>
+            <dt className="text-vc-muted">Taluk</dt>
+            <dd className="font-medium">{village.taluk || '—'}</dd>
+          </div>
           <div>
             <dt className="text-vc-muted">District</dt>
             <dd className="font-medium">{village.district}</dd>
+          </div>
+          <div>
+            <dt className="text-vc-muted">PIN</dt>
+            <dd className="font-medium">{village.pincode}</dd>
           </div>
           <div>
             <dt className="text-vc-muted">State</dt>
