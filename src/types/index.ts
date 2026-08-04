@@ -132,10 +132,12 @@ export interface AdminUser {
   villageId: string
 }
 
-/** Citizen session (name + mobile login) */
+/** Citizen session (mobile OTP + profile) */
 export interface CitizenUser {
   fullName: string
   mobile: string
+  areaId?: string
+  areaName?: string
   loggedInAt: string
 }
 

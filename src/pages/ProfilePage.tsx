@@ -27,8 +27,9 @@ export function ProfilePage() {
 
       <div className="rounded-3xl bg-white border border-emerald-100 divide-y divide-emerald-50 overflow-hidden">
         <Row label={t('profile.name')} value={citizen?.fullName || '—'} />
-        <Row label={t('profile.mobile')} value={citizen?.mobile || '—'} />
+        <Row label={t('profile.mobile')} value={citizen?.mobile ? `+91 ${citizen.mobile}` : '—'} />
         <Row label={t('profile.village')} value={village.name} />
+        <Row label={t('profile.area')} value={citizen?.areaName || '—'} />
       </div>
 
       <div className="rounded-3xl bg-white border border-emerald-100 p-5">

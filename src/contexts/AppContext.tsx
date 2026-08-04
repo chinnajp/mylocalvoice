@@ -11,6 +11,7 @@ import i18n from '@/i18n'
 import { DEFAULT_VILLAGE } from '@/constants'
 import type { AdminUser, CitizenUser, VillageConfig } from '@/types'
 import { loginAdmin, logoutAdminSession } from '@/services/complaints'
+import { saveCitizenProfile } from '@/services/citizenAuth'
 
 export type AppLanguage = 'en' | 'ta'
 
@@ -23,7 +24,7 @@ interface AppContextValue {
   setLanguage: (lang: AppLanguage, markChosen?: boolean) => void
   resetLanguageChoice: () => void
   citizen: CitizenUser | null
-  loginCitizen: (fullName: string, mobile: string) => void
+  loginCitizen: (user: Omit<CitizenUser, 'loggedInAt'> & { loggedInAt?: string }) => void
   logoutCitizen: () => void
   admin: AdminUser | null
   loginAdminUser: (email: string, password: string) => Promise<void>
@@ -56,7 +57,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [languageChosen, setLanguageChosen] = useState(
     () => localStorage.getItem('vc-lang-chosen') === '1',
   )
-  const [citizen, setCitizen] = useState<CitizenUser | null>(() => readCitizen())
+  const [citizen, setCitizen] = useState<CitizenUser | null>(() => {
+    const existing = readCitizen()
+    if (existing?.mobile && existing.fullName) {
+      saveCitizenProfile({
+        fullName: existing.fullName,
+        mobile: existing.mobile,
+        areaId: existing.areaId,
+        areaName: existing.areaName,
+      })
+    }
+    return existing
+  })
   const [admin, setAdmin] = useState<AdminUser | null>(() => {
     const raw = localStorage.getItem('vc-admin')
     return raw ? (JSON.parse(raw) as AdminUser) : null
@@ -102,15 +114,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('vc-lang-chosen')
   }, [])
 
-  const loginCitizen = useCallback((fullName: string, mobile: string) => {
-    const user: CitizenUser = {
-      fullName: fullName.trim(),
-      mobile: mobile.replace(/\D/g, '').slice(-10),
-      loggedInAt: new Date().toISOString(),
-    }
-    setCitizen(user)
-    localStorage.setItem('vc-citizen', JSON.stringify(user))
-  }, [])
+  const loginCitizen = useCallback(
+    (input: Omit<CitizenUser, 'loggedInAt'> & { loggedInAt?: string }) => {
+      const user: CitizenUser = {
+        fullName: input.fullName.trim(),
+        mobile: input.mobile.replace(/\D/g, '').slice(-10),
+        areaId: input.areaId,
+        areaName: input.areaName,
+        loggedInAt: input.loggedInAt || new Date().toISOString(),
+      }
+      saveCitizenProfile({
+        fullName: user.fullName,
+        mobile: user.mobile,
+        areaId: user.areaId,
+        areaName: user.areaName,
+      })
+      setCitizen(user)
+      localStorage.setItem('vc-citizen', JSON.stringify(user))
+    },
+    [],
+  )
 
   const logoutCitizen = useCallback(() => {
     setCitizen(null)
