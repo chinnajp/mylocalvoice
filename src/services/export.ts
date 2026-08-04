@@ -6,7 +6,12 @@ import autoTable from 'jspdf-autotable'
 import * as XLSX from 'xlsx'
 import { downloadBlob } from '@/utils'
 
-export function downloadComplaintPdf(complaint: Complaint, villageName: string) {
+export function downloadComplaintPdf(
+  complaint: Complaint,
+  villageName: string,
+  options?: { includeReporterInfo?: boolean },
+) {
+  const includeReporterInfo = options?.includeReporterInfo === true
   const doc = new jsPDF()
   doc.setFontSize(18)
   doc.text('MyLocalVoice — Complaint Report', 14, 20)
@@ -24,8 +29,8 @@ export function downloadComplaintPdf(complaint: Complaint, villageName: string) 
       ['Updated', formatDateTime(complaint.updatedAt)],
       ['Location', complaint.location.address || `${complaint.location.lat}, ${complaint.location.lng}`],
       ['Supporters', String(complaint.supporters)],
-      ['Reporter', complaint.fullName || 'Anonymous'],
-      ['Mobile', complaint.mobile || '—'],
+      ['Reporter', includeReporterInfo ? (complaint.fullName || 'Anonymous') : 'Hidden'],
+      ['Mobile', includeReporterInfo ? (complaint.mobile || '—') : 'Hidden'],
       ['Description', complaint.description],
       ['Assigned To', complaint.assignedTo || '—'],
     ],

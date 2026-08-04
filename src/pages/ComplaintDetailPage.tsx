@@ -24,6 +24,7 @@ import { CATEGORY_LABELS } from '@/constants'
 import { useApp } from '@/contexts/AppContext'
 import type { Complaint } from '@/types'
 import { formatDateTime, getStatusBadgeClass, statusLabel } from '@/utils'
+import { isLeadership } from '@/utils/roles'
 
 export function ComplaintDetailPage() {
   const { id = '' } = useParams()
@@ -73,6 +74,7 @@ export function ComplaintDetailPage() {
     typeof window !== 'undefined' && window.location.hostname === 'localhost'
       ? `${window.location.origin}/complaints/${complaint.complaintId}`
       : `https://mylocalvoice.in/complaints/${complaint.complaintId}`
+  const canViewReporterInfo = isLeadership(admin?.role)
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 space-y-6">
@@ -96,14 +98,18 @@ export function ComplaintDetailPage() {
           </div>
           <p className="text-sm text-vc-muted">
             Submitted {formatDateTime(complaint.createdAt)}
-            {complaint.fullName ? ` · ${complaint.fullName}` : ''}
+            {canViewReporterInfo && complaint.fullName ? ` · ${complaint.fullName}` : ''}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => downloadComplaintPdf(complaint, village.name)}
+            onClick={() =>
+              downloadComplaintPdf(complaint, village.name, {
+                includeReporterInfo: canViewReporterInfo,
+              })
+            }
           >
             <Download className="h-4 w-4" /> {t('detail.downloadPdf')}
           </Button>

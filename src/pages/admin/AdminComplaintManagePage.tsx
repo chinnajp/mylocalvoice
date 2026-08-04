@@ -29,6 +29,7 @@ import {
   canDeleteComplaints,
   canEditComplaint,
   canSetStatus,
+  isLeadership,
   roleLabel,
 } from '@/utils/roles'
 
@@ -50,6 +51,7 @@ export function AdminComplaintManagePage() {
   const role = admin?.role
   const canAssign = canAssignComplaints(role)
   const canDelete = canDeleteComplaints(role)
+  const canViewReporterInfo = isLeadership(role)
   const allowedStatuses = useMemo(() => allowedStatusesForRole(role), [role])
   const canEdit = canEditComplaint(admin, complaint)
 
@@ -257,6 +259,18 @@ export function AdminComplaintManagePage() {
       </div>
 
       <Card className="mb-4">
+        {canViewReporterInfo ? (
+          <div className="mb-4 pb-4 border-b border-vc-border/60">
+            <h2 className="label-caps mb-2">Reporter</h2>
+            <p className="text-sm text-slate-300">
+              Name: <span className="text-white">{complaint.fullName || 'Anonymous'}</span>
+            </p>
+            <p className="text-sm text-slate-300">
+              Mobile: <span className="text-white">{complaint.mobile || '—'}</span>
+            </p>
+          </div>
+        ) : null}
+
         <h2 className="label-caps mb-2">Description</h2>
         <p className="text-sm text-slate-300 mb-4">{complaint.description}</p>
 
