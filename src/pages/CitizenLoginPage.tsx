@@ -130,6 +130,12 @@ export function CitizenLoginPage() {
     try {
       const result = verifyCitizenOtp(mobile, data.otp)
       if (result.isNewUser || !result.profile) {
+        if (result.profile?.fullName) {
+          profileForm.setValue('fullName', result.profile.fullName)
+        }
+        if (result.profile?.areaId) {
+          profileForm.setValue('areaId', result.profile.areaId)
+        }
         setStep('profile')
         return
       }
@@ -144,13 +150,16 @@ export function CitizenLoginPage() {
   const onSaveProfile = profileForm.handleSubmit((data) => {
     setFormError('')
     const area = VILLAGE_AREAS.find((a) => a.id === data.areaId)
-    const areaName =
-      area && i18n.language === 'ta' ? area.nameTa : area?.name
+    if (!area) {
+      setFormError(t('login.areaRequired'))
+      return
+    }
+    const areaName = i18n.language === 'ta' ? area.nameTa : area.name
     const profile = saveCitizenProfile({
       fullName: data.fullName,
       mobile,
-      areaId: data.areaId || undefined,
-      areaName: areaName || undefined,
+      areaId: area.id,
+      areaName,
     })
     loginCitizen(profileToCitizenUser(profile))
     navigate('/')
@@ -334,10 +343,12 @@ export function CitizenLoginPage() {
 
             <div>
               <label className="block text-sm font-semibold text-emerald-950 mb-2">
-                {t('login.area')} <span className="text-emerald-600/60 font-normal">({t('login.optional')})</span>
+                {t('login.area')} <span className="text-red-500">*</span>
               </label>
               <select
-                {...profileForm.register('areaId')}
+                {...profileForm.register('areaId', {
+                  required: t('login.areaRequired'),
+                })}
                 className="w-full rounded-2xl border-2 border-emerald-100 bg-emerald-50/50 px-4 py-3.5 text-base text-emerald-950 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15"
               >
                 <option value="">{t('login.areaPlaceholder')}</option>
@@ -347,6 +358,11 @@ export function CitizenLoginPage() {
                   </option>
                 ))}
               </select>
+              {profileForm.formState.errors.areaId ? (
+                <p className="text-sm text-red-600 mt-1.5">
+                  {profileForm.formState.errors.areaId.message}
+                </p>
+              ) : null}
             </div>
 
             {formError ? <p className="text-sm text-red-600">{formError}</p> : null}

@@ -160,7 +160,7 @@ export function verifyCitizenOtp(mobileInput: string, otpInput: string): VerifyO
   const profile = getCitizenProfile(mobile)
   return {
     mobile,
-    isNewUser: !profile?.fullName?.trim(),
+    isNewUser: !profile?.fullName?.trim() || !profile?.areaId,
     profile,
   }
 }

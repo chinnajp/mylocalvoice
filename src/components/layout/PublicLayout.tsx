@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { useApp } from '@/contexts/AppContext'
+import { VILLAGE_AREAS } from '@/constants'
 import { Button } from '@/components/ui'
 import { cn } from '@/utils'
 
@@ -31,6 +32,15 @@ export function PublicLayout() {
   const navigate = useNavigate()
   const { village, theme, toggleTheme, language, setLanguage, citizen, logoutCitizen } = useApp()
   const [open, setOpen] = useState(false)
+
+  const selectedArea = VILLAGE_AREAS.find((a) => a.id === citizen?.areaId)
+  const headerPlace =
+    (selectedArea
+      ? language === 'ta'
+        ? selectedArea.nameTa
+        : selectedArea.name
+      : citizen?.areaName) ||
+    (language === 'ta' ? village.nameTa : village.name)
 
   const toggleLang = () => {
     setLanguage(language === 'ta' ? 'en' : 'ta', true)
@@ -54,7 +64,9 @@ export function PublicLayout() {
               <p className="font-display font-bold text-xs sm:text-sm leading-tight dark:text-white text-light-text truncate max-w-[120px] sm:max-w-none">
                 {t('brand')}
               </p>
-              <p className="text-[10px] text-vc-muted leading-tight truncate">{village.name}</p>
+              <p className="text-[10px] text-vc-muted leading-tight truncate max-w-[140px] sm:max-w-[200px]">
+                {headerPlace}
+              </p>
             </div>
           </Link>
 

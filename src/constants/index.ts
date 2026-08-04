@@ -90,23 +90,30 @@ export const VILLAGE_AREAS = [
   {
     id: 'thiruppair',
     name: 'Thiruppair',
-    nameTa: 'திருப்பைர்',
+    nameTa: 'திருப்பேர்',
     lat: 13.2094057,
     lng: 79.8342263,
   },
   {
     id: 'thiruppair-colony',
     name: 'Thiruppair Colony',
-    nameTa: 'திருப்பைர் காலனி',
+    nameTa: 'திருப்பேர் காலனி',
     lat: 13.2112,
     lng: 79.8358,
   },
   {
     id: 'thiruppair-st-colony',
     name: 'Thiruppair ST Colony',
-    nameTa: 'திருப்பைர் எஸ்.டி. காலனி',
+    nameTa: 'திருப்பேர் எஸ்.டி. காலனி (பழங்குடியினர் காலனி)',
     lat: 13.2104,
     lng: 79.8364,
+  },
+  {
+    id: 'bangarampettai',
+    name: 'Bangarampettai',
+    nameTa: 'பங்காரம்பேட்டை',
+    lat: 13.2078,
+    lng: 79.8315,
   },
   {
     id: 'arumbakkam',
@@ -125,16 +132,9 @@ export const VILLAGE_AREAS = [
   {
     id: 'arumbakkam-st-colony',
     name: 'Arumbakkam ST Colony',
-    nameTa: 'அரும்பாக்கம் எஸ்.டி. காலனி',
+    nameTa: 'அரும்பாக்கம் எஸ்.டி. காலனி (பழங்குடியினர் காலனி)',
     lat: 13.2052,
     lng: 79.8378,
-  },
-  {
-    id: 'bangarampettai',
-    name: 'Bangarampettai',
-    nameTa: 'பங்காரம் பேட்டை',
-    lat: 13.2078,
-    lng: 79.8315,
   },
   {
     id: 'parigulam',
@@ -142,13 +142,6 @@ export const VILLAGE_AREAS = [
     nameTa: 'பரிகுளம்',
     lat: 13.2125,
     lng: 79.8322,
-  },
-  {
-    id: 'irular-colony',
-    name: 'Irular Colony',
-    nameTa: 'இருளர் காலனி',
-    lat: 13.2088,
-    lng: 79.8332,
   },
 ] as const
 
@@ -165,11 +158,11 @@ export const SITE_URL = 'https://mylocalvoice.in'
 export const DEFAULT_VILLAGE = {
   id: 'thiruppair',
   name: 'Thiruppair',
-  nameTa: 'திருப்பைர்',
+  nameTa: 'திருப்பேர்',
   panchayat: 'Thiruppair Village Panchayat',
-  panchayatTa: 'திருப்பைர் கிராம பஞ்சாயத்து',
+  panchayatTa: 'திருப்பேர் ஊராட்சி',
   block: 'Poondi',
-  blockTa: 'பூண்டி ஒன்றியம்',
+  blockTa: 'பூண்டி ஊராட்சி ஒன்றியம்',
   taluk: 'Thiruvallur',
   talukTa: 'திருவள்ளூர்',
   code: 'TP',

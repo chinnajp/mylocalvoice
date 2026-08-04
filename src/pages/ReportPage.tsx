@@ -29,10 +29,12 @@ export function ReportPage() {
   const { t, i18n } = useTranslation()
   const { voterKey, citizen, village } = useApp()
   const navigate = useNavigate()
+  const defaultArea =
+    VILLAGE_AREAS.find((a) => a.id === citizen?.areaId) || VILLAGE_AREAS[0]
   const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useForm<FormValues>({
     defaultValues: {
       category: 'street_light',
-      areaId: VILLAGE_AREAS[0].id,
+      areaId: defaultArea.id,
       fullName: citizen?.fullName || '',
       mobile: citizen?.mobile || '',
       description: '',
@@ -44,10 +46,10 @@ export function ReportPage() {
   const [voiceFile, setVoiceFile] = useState<File | null>(null)
   const [recording, setRecording] = useState(false)
   const [location, setLocation] = useState<GeoLocation>({
-    lat: VILLAGE_AREAS[0].lat,
-    lng: VILLAGE_AREAS[0].lng,
-    address: VILLAGE_AREAS[0].name,
-    areaId: VILLAGE_AREAS[0].id,
+    lat: defaultArea.lat,
+    lng: defaultArea.lng,
+    address: defaultArea.name,
+    areaId: defaultArea.id,
   })
   const [duplicates, setDuplicates] = useState<Complaint[]>([])
   const [allComplaints, setAllComplaints] = useState<Complaint[]>([])
