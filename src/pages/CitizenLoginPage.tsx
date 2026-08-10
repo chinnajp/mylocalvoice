@@ -99,7 +99,7 @@ export function CitizenLoginPage() {
     try {
       const result = await sendCitizenOtp(data.mobile)
       setMobile(result.mobile)
-      setDemoCode(result.demoCode)
+      setDemoCode(result.demoCode ?? '')
       otpForm.reset({ otp: '' })
       setStep('otp')
     } catch (e) {
@@ -115,7 +115,7 @@ export function CitizenLoginPage() {
     setSending(true)
     try {
       const result = await sendCitizenOtp(mobile)
-      setDemoCode(result.demoCode)
+      setDemoCode(result.demoCode ?? '')
       otpForm.reset({ otp: '' })
     } catch (e) {
       const code = e instanceof Error ? e.message : 'SEND_FAILED'
@@ -125,10 +125,11 @@ export function CitizenLoginPage() {
     }
   }
 
-  const onVerifyOtp = otpForm.handleSubmit((data) => {
+  const onVerifyOtp = otpForm.handleSubmit(async (data) => {
     setFormError('')
+    setSending(true)
     try {
-      const result = verifyCitizenOtp(mobile, data.otp)
+      const result = await verifyCitizenOtp(mobile, data.otp)
       if (result.isNewUser || !result.profile) {
         if (result.profile?.fullName) {
           profileForm.setValue('fullName', result.profile.fullName)
@@ -144,6 +145,8 @@ export function CitizenLoginPage() {
     } catch (e) {
       const code = e instanceof Error ? e.message : 'OTP_INVALID'
       setFormError(otpErrorMessage(code, t))
+    } finally {
+      setSending(false)
     }
   })
 

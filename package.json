@@ -7,6 +7,8 @@
     "dev": "vite",
     "dev:firebase": "concurrently -k -n emu,web -c magenta,cyan \"npm run emulators\" \"npm run dev\"",
     "emulators": "firebase emulators:start --project demo-mylocalvoice",
+    "functions:install": "npm install --prefix functions",
+    "functions:deploy": "firebase deploy --only functions",
     "seed:admin": "node scripts/seed-admin.mjs",
     "verify:firebase": "node scripts/verify-firebase.mjs && node scripts/verify-client-flow.mjs",
     "firebase:deploy-rules": "firebase deploy --only firestore:rules,storage",

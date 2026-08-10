@@ -11,6 +11,7 @@ interface ImportMetaEnv {
   readonly VITE_VILLAGE_ID: string
   readonly VITE_USE_MOCK_DATA: string
   readonly VITE_USE_FIREBASE_EMULATOR: string
+  readonly VITE_USE_CLOUD_FUNCTIONS: string
 }
 
 interface ImportMeta {

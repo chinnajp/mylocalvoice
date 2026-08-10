@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Card, PageTitle } from '@/components/ui'
 import { useApp } from '@/contexts/AppContext'
-import { useMockData, useEmulator } from '@/lib/firebase'
+import { useMockData, useEmulator, useCloudFunctions } from '@/lib/firebase'
 import { roleLabel } from '@/utils/roles'
 
 export function AdminSettingsPage() {
@@ -98,8 +98,21 @@ export function AdminSettingsPage() {
               {useEmulator ? ' (local emulator — start with npm run emulators)' : ''}.
             </li>
           )}
-          <li>Notifications: SMS / WhatsApp / Email / Push providers stubbed in services/notifications.ts</li>
-          <li>Maps: set VITE_GOOGLE_MAPS_API_KEY for live Google Maps</li>
+          <li>
+            OTP / status SMS:{' '}
+            <span className={useCloudFunctions && !useMockData ? 'text-emerald-400' : 'text-amber-400'}>
+              {useCloudFunctions && !useMockData
+                ? 'Cloud Functions (deploy functions + set SMS_PROVIDER)'
+                : 'Demo / console (see PRODUCTION_SETUP.md)'}
+            </span>
+          </li>
+          <li>
+            Maps:{' '}
+            {import.meta.env.VITE_GOOGLE_MAPS_API_KEY &&
+            import.meta.env.VITE_GOOGLE_MAPS_API_KEY !== 'your_google_maps_api_key'
+              ? 'Google Maps key configured'
+              : 'set VITE_GOOGLE_MAPS_API_KEY for live maps'}
+          </li>
         </ul>
       </Card>
     </div>

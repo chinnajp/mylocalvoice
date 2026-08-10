@@ -1,14 +1,9 @@
 import type { NotificationPayload } from '@/types'
+import { useCloudFunctions, useMockData } from '@/lib/firebase'
 
 /**
- * Notification architecture — plug in real providers later:
- * - SMS: Twilio / MSG91 / Fast2SMS
- * - WhatsApp: Meta Cloud API / Twilio
- * - Email: SendGrid / Firebase Extensions
- * - Push: Firebase Cloud Messaging
- *
- * Prefer a Cloud Function trigger on complaint status change
- * that fans out to the selected channels.
+ * Client-side notification stubs (console). Live SMS OTP + status SMS
+ * are handled by Cloud Functions when useCloudFunctions is on — see functions/.
  */
 
 export interface NotificationProvider {
@@ -54,6 +49,11 @@ export async function sendNotification(payload: NotificationPayload) {
   return providers[payload.channel].send(payload)
 }
 
+/** When Cloud Functions handle status SMS, skip duplicate client SMS/WhatsApp */
+function statusSmsViaCloud() {
+  return !useMockData && useCloudFunctions
+}
+
 export async function notifyComplaintStatus(
   mobile: string | undefined,
   email: string | undefined,
@@ -63,7 +63,7 @@ export async function notifyComplaintStatus(
   const body = `MyLocalVoice: Complaint ${complaintId} is now "${statusLabel}". Track at https://mylocalvoice.in/track?id=${complaintId}`
   const results = []
 
-  if (mobile) {
+  if (mobile && !statusSmsViaCloud()) {
     results.push(await sendNotification({ channel: 'sms', to: mobile, body, complaintId }))
     results.push(await sendNotification({ channel: 'whatsapp', to: mobile, body, complaintId }))
   }
