@@ -17,6 +17,7 @@ import { useState } from 'react'
 import { useApp } from '@/contexts/AppContext'
 import { VILLAGE_AREAS } from '@/constants'
 import { Button } from '@/components/ui'
+import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
 import { cn } from '@/utils'
 
 const links = [
@@ -165,11 +166,13 @@ export function PublicLayout() {
         ) : null}
       </header>
 
-      <main className="flex-1">
+      <main className="flex-1 pb-24 md:pb-0">
         <Outlet />
       </main>
 
-      <footer className="border-t dark:border-vc-border border-light-border dark:bg-vc-surface bg-white mt-auto">
+      <MobileBottomNav />
+
+      <footer className="hidden md:block border-t dark:border-vc-border border-light-border dark:bg-vc-surface bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-10 grid md:grid-cols-3 gap-8">
           <div>
             <p className="font-display font-bold text-lg dark:text-white text-light-text mb-2">{t('brand')}</p>

@@ -5,6 +5,9 @@ import { AdminLayout } from '@/components/layout/AdminLayout'
 import { WelcomePage } from '@/pages/WelcomePage'
 import { CitizenLoginPage } from '@/pages/CitizenLoginPage'
 import { HomePage } from '@/pages/HomePage'
+import { MyReportsPage } from '@/pages/MyReportsPage'
+import { NotificationsPage } from '@/pages/NotificationsPage'
+import { ProfilePage } from '@/pages/ProfilePage'
 import { ReportPage } from '@/pages/ReportPage'
 import { TrackPage } from '@/pages/TrackPage'
 import { MapPage } from '@/pages/MapPage'
@@ -19,7 +22,7 @@ import { AdminReportsPage } from '@/pages/admin/AdminReportsPage'
 import { AdminActivityPage } from '@/pages/admin/AdminActivityPage'
 import { AdminSettingsPage } from '@/pages/admin/AdminSettingsPage'
 
-/** Gate: language → login → original public site */
+/** Gate: language → login → public site */
 function RequireCitizen() {
   const { languageChosen, citizen } = useApp()
   if (!languageChosen) return <Navigate to="/welcome" replace />
@@ -38,6 +41,9 @@ export default function App() {
           <Route element={<RequireCitizen />}>
             <Route element={<PublicLayout />}>
               <Route index element={<HomePage />} />
+              <Route path="my-reports" element={<MyReportsPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
+              <Route path="profile" element={<ProfilePage />} />
               <Route path="report" element={<ReportPage />} />
               <Route path="track" element={<TrackPage />} />
               <Route path="map" element={<MapPage />} />

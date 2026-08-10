@@ -36,7 +36,7 @@ export function HomePage() {
   return (
     <div>
       {/* Hero — centered, full-bleed */}
-      <section className="relative min-h-[calc(100dvh-4rem)] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[calc(100dvh-8.5rem)] md:min-h-[calc(100dvh-4rem)] flex items-center justify-center overflow-hidden">
         <img
           src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1800&q=80"
           alt={`${village.name} village`}
