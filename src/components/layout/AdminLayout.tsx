@@ -7,6 +7,7 @@ import {
   ScrollText,
   Settings,
   List,
+  Bell,
   TreePine,
   Menu,
   X,
@@ -31,6 +32,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
     items: [
       { to: '/admin', end: true, icon: LayoutDashboard, label: 'Dashboard' },
       { to: '/admin/statistics', icon: BarChart3, label: 'Statistics' },
+      { to: '/admin/notifications', icon: Bell, label: 'Notifications' },
     ],
   },
   {

@@ -34,7 +34,13 @@ import {
   mockAnnouncements,
   mockComplaints,
 } from '@/data/mockData'
-import { avgResolutionDays, generateComplaintId, isPendingStatus, parseComplaintSequence, compareComplaintIdAsc } from '@/utils'
+import {
+  avgResolutionDays,
+  generateComplaintId,
+  isPendingStatus,
+  parseComplaintSequence,
+  compareComplaintIdDesc,
+} from '@/utils'
 import { canAssignComplaints, canDeleteComplaints, canEditComplaint, canSetStatus } from '@/utils/roles'
 import { auth, db, useMockData } from '@/lib/firebase'
 import { notifyComplaintStatus } from '@/services/notifications'
@@ -231,7 +237,7 @@ function filterComplaints(
         CATEGORY_LABELS[c.category].toLowerCase().includes(q),
     )
   }
-  return result.sort((a, b) => compareComplaintIdAsc(a.complaintId, b.complaintId))
+  return result.sort((a, b) => compareComplaintIdDesc(a.complaintId, b.complaintId))
 }
 
 function buildDashboardStats(list: Complaint[]): DashboardStats {
@@ -294,13 +300,13 @@ export async function getComplaints(villageId: string = DEFAULT_VILLAGE.id): Pro
     await delay()
     return complaintsStore
       .filter((c) => c.villageId === villageId)
-      .sort((a, b) => compareComplaintIdAsc(a.complaintId, b.complaintId))
+      .sort((a, b) => compareComplaintIdDesc(a.complaintId, b.complaintId))
   }
 
   const snap = await getDocs(query(complaintsCol(villageId), orderBy('createdAt', 'desc')))
   return snap.docs
     .map((d) => docToComplaint(d.id, d.data()))
-    .sort((a, b) => compareComplaintIdAsc(a.complaintId, b.complaintId))
+    .sort((a, b) => compareComplaintIdDesc(a.complaintId, b.complaintId))
 }
 
 export async function getComplaintById(

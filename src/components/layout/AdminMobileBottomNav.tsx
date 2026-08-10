@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LayoutDashboard, List, FileText, Settings } from 'lucide-react'
+import { LayoutDashboard, List, Bell, Settings } from 'lucide-react'
 import { cn } from '@/utils'
 
 const tabs = [
   { to: '/admin', end: true, icon: LayoutDashboard, labelKey: 'admin.dashboard' },
   { to: '/admin/complaints', end: false, icon: List, labelKey: 'admin.complaints' },
-  { to: '/admin/reports', end: false, icon: FileText, labelKey: 'admin.reports' },
+  { to: '/admin/notifications', end: false, icon: Bell, labelKey: 'admin.notifications' },
   { to: '/admin/settings', end: false, icon: Settings, labelKey: 'admin.settings' },
 ]
 

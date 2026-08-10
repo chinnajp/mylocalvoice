@@ -20,6 +20,7 @@ import { AdminComplaintsPage } from '@/pages/admin/AdminComplaintsPage'
 import { AdminComplaintManagePage } from '@/pages/admin/AdminComplaintManagePage'
 import { AdminReportsPage } from '@/pages/admin/AdminReportsPage'
 import { AdminActivityPage } from '@/pages/admin/AdminActivityPage'
+import { AdminNotificationsPage } from '@/pages/admin/AdminNotificationsPage'
 import { AdminSettingsPage } from '@/pages/admin/AdminSettingsPage'
 
 /** Gate: language → login → public site */
@@ -60,6 +61,7 @@ export default function App() {
             <Route path="complaints/:id" element={<AdminComplaintManagePage />} />
             <Route path="reports" element={<AdminReportsPage />} />
             <Route path="activity" element={<AdminActivityPage />} />
+            <Route path="notifications" element={<AdminNotificationsPage />} />
             <Route path="settings" element={<AdminSettingsPage />} />
           </Route>
 

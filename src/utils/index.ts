@@ -26,6 +26,11 @@ export function compareComplaintIdAsc(a: string, b: string) {
   return a.localeCompare(b)
 }
 
+/** Sort by complaint number descending (newest first: …00005, 00004, 00003) */
+export function compareComplaintIdDesc(a: string, b: string) {
+  return compareComplaintIdAsc(b, a)
+}
+
 export function formatDate(iso: string, locale = 'en-IN') {
   return new Date(iso).toLocaleDateString(locale, {
     day: 'numeric',
