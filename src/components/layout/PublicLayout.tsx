@@ -120,7 +120,7 @@ export function PublicLayout() {
                 <Button
                   variant="accent"
                   size="sm"
-                  className="shrink-0 rounded-full px-5 sm:px-6 py-2 text-sm font-semibold text-white shadow-md shadow-amber-500/30 hover:brightness-110 hover:shadow-lg hover:shadow-amber-500/40"
+                  className="hidden md:inline-flex shrink-0 rounded-full px-5 sm:px-6 py-2 text-sm font-semibold text-white shadow-md shadow-amber-500/30 hover:brightness-110 hover:shadow-lg hover:shadow-amber-500/40"
                   onClick={signOut}
                 >
                   {t('nav.logout')}
@@ -153,13 +153,6 @@ export function PublicLayout() {
             {citizen ? (
               <div className="pt-2 border-t dark:border-vc-border border-light-border mt-2">
                 <p className="px-3 py-1 text-xs text-vc-muted truncate">{citizen.fullName}</p>
-                <Button
-                  variant="accent"
-                  className="w-full mt-1 rounded-full py-2.5 font-semibold text-white shadow-md shadow-amber-500/30 hover:brightness-110"
-                  onClick={signOut}
-                >
-                  {t('nav.logout')}
-                </Button>
               </div>
             ) : null}
           </nav>
