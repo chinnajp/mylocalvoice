@@ -1,9 +1,9 @@
 import type { NotificationPayload } from '@/types'
-import { useCloudFunctions, useMockData } from '@/lib/firebase'
+import { useCloudFunctions, useMockData, useOtpApi } from '@/lib/firebase'
 
 /**
- * Client-side notification stubs (console). Live SMS OTP + status SMS
- * are handled by Cloud Functions when useCloudFunctions is on — see functions/.
+ * Client stubs + optional Vercel /api/notify-status for live SMS on Spark.
+ * Firebase Cloud Functions path is opt-in (Blaze only).
  */
 
 export interface NotificationProvider {
@@ -49,9 +49,8 @@ export async function sendNotification(payload: NotificationPayload) {
   return providers[payload.channel].send(payload)
 }
 
-/** When Cloud Functions handle status SMS, skip duplicate client SMS/WhatsApp */
-function statusSmsViaCloud() {
-  return !useMockData && useCloudFunctions
+function liveStatusSms() {
+  return !useMockData && (useOtpApi || useCloudFunctions)
 }
 
 export async function notifyComplaintStatus(
@@ -63,10 +62,22 @@ export async function notifyComplaintStatus(
   const body = `MyLocalVoice: Complaint ${complaintId} is now "${statusLabel}". Track at https://mylocalvoice.in/track?id=${complaintId}`
   const results = []
 
-  if (mobile && !statusSmsViaCloud()) {
+  if (mobile && useOtpApi && !useMockData) {
+    try {
+      const res = await fetch('/api/notify-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile, complaintId, statusLabel }),
+      })
+      results.push({ success: res.ok, id: 'api_notify_status' })
+    } catch {
+      results.push({ success: false, error: 'NOTIFY_API_FAILED' })
+    }
+  } else if (mobile && !liveStatusSms()) {
     results.push(await sendNotification({ channel: 'sms', to: mobile, body, complaintId }))
     results.push(await sendNotification({ channel: 'whatsapp', to: mobile, body, complaintId }))
   }
+
   if (email) {
     results.push(
       await sendNotification({

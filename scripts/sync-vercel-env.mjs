@@ -26,13 +26,15 @@ const keys = [
   'VITE_USE_MOCK_DATA',
   'VITE_USE_FIREBASE_EMULATOR',
   'VITE_USE_CLOUD_FUNCTIONS',
+  'VITE_USE_OTP_API',
   'VITE_GOOGLE_MAPS_API_KEY',
 ]
 
-// Force cloud mode on Vercel
+// Force cloud Firebase + Spark-friendly OTP API on Vercel
 vars.VITE_USE_MOCK_DATA = 'false'
 vars.VITE_USE_FIREBASE_EMULATOR = 'false'
-if (!vars.VITE_USE_CLOUD_FUNCTIONS) vars.VITE_USE_CLOUD_FUNCTIONS = 'true'
+vars.VITE_USE_CLOUD_FUNCTIONS = 'false'
+vars.VITE_USE_OTP_API = 'true'
 
 const envs = ['production', 'preview', 'development']
 

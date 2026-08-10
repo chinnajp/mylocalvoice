@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Card, PageTitle } from '@/components/ui'
 import { useApp } from '@/contexts/AppContext'
-import { useMockData, useEmulator, useCloudFunctions } from '@/lib/firebase'
+import { useMockData, useEmulator, useCloudFunctions, useOtpApi } from '@/lib/firebase'
 import { roleLabel } from '@/utils/roles'
 
 export function AdminSettingsPage() {
@@ -100,10 +100,16 @@ export function AdminSettingsPage() {
           )}
           <li>
             OTP / status SMS:{' '}
-            <span className={useCloudFunctions && !useMockData ? 'text-emerald-400' : 'text-amber-400'}>
-              {useCloudFunctions && !useMockData
-                ? 'Cloud Functions (deploy functions + set SMS_PROVIDER)'
-                : 'Demo / console (see PRODUCTION_SETUP.md)'}
+            <span
+              className={
+                !useMockData && (useOtpApi || useCloudFunctions) ? 'text-emerald-400' : 'text-amber-400'
+              }
+            >
+              {!useMockData && useOtpApi
+                ? 'Vercel API (Spark OK — set SMS_PROVIDER + OTP_SECRET)'
+                : !useMockData && useCloudFunctions
+                  ? 'Cloud Functions (Blaze required)'
+                  : 'Demo / console (see PRODUCTION_SETUP.md)'}
             </span>
           </li>
           <li>

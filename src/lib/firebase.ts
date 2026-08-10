@@ -20,10 +20,19 @@ export const useMockData =
   !firebaseConfig.apiKey ||
   firebaseConfig.apiKey === 'your_api_key'
 
-/** Use Cloud Functions for OTP / live SMS when not in pure mock mode */
-export const useCloudFunctions =
-  import.meta.env.VITE_USE_CLOUD_FUNCTIONS === 'true' ||
-  (!useMockData && import.meta.env.VITE_USE_CLOUD_FUNCTIONS !== 'false')
+/**
+ * Firebase Cloud Functions (needs Blaze). Opt-in only — Spark stays off.
+ * Prefer Vercel OTP API on Spark: see useOtpApi.
+ */
+export const useCloudFunctions = import.meta.env.VITE_USE_CLOUD_FUNCTIONS === 'true'
+
+/**
+ * Vercel /api OTP + status SMS (works on Firebase Spark).
+ * On when explicitly enabled, or in production with live Firebase and no Cloud Functions.
+ */
+export const useOtpApi =
+  import.meta.env.VITE_USE_OTP_API === 'true' ||
+  (!useMockData && !useCloudFunctions && import.meta.env.PROD && import.meta.env.VITE_USE_OTP_API !== 'false')
 
 let app: FirebaseApp | null = null
 let auth: Auth | null = null
@@ -37,13 +46,17 @@ if (!useMockData) {
   auth = getAuth(app)
   db = getFirestore(app)
   storage = getStorage(app)
-  functions = getFunctions(app)
+  if (useCloudFunctions) {
+    functions = getFunctions(app)
+  }
 
   if (useEmulator && !emulatorsConnected) {
     connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true })
     connectFirestoreEmulator(db, '127.0.0.1', 8080)
     connectStorageEmulator(storage, '127.0.0.1', 9199)
-    connectFunctionsEmulator(functions, '127.0.0.1', 5001)
+    if (functions) {
+      connectFunctionsEmulator(functions, '127.0.0.1', 5001)
+    }
     emulatorsConnected = true
   }
 }
