@@ -677,7 +677,7 @@ export async function deleteComplaint(
   role?: AdminUser['role'],
 ) {
   if (!canDeleteComplaints(role)) {
-    throw new Error('Only the Village President can delete complaints')
+    throw new Error('Only Admin can delete complaints')
   }
 
   if (useMockData) {
@@ -825,10 +825,14 @@ export async function loginAdmin(email: string, password: string): Promise<Admin
   }
 
   const data = adminSnap.data()
+  let displayName = (data.displayName as string) || cred.user.displayName || 'Admin'
+  if (displayName === 'Main Admin' || displayName === 'Super Admin') {
+    displayName = 'Admin'
+  }
   return {
     uid: cred.user.uid,
     email: cred.user.email || email,
-    displayName: (data.displayName as string) || cred.user.displayName || 'Admin',
+    displayName,
     role: (data.role as AdminUser['role']) || 'staff',
     villageId: (data.villageId as string) || DEFAULT_VILLAGE.id,
   }

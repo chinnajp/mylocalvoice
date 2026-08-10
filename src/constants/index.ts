@@ -25,7 +25,7 @@ export const STATUS_COLORS: Record<ComplaintStatus, string> = {
   assigned: '#eab308',
   in_progress: '#eab308',
   resolved: '#22c55e',
-  closed: '#64748b',
+  closed: '#22c55e',
 }
 
 /** Map marker colors */
@@ -146,7 +146,7 @@ export const VILLAGE_AREAS = [
 ] as const
 
 /** Staff accounts the president can assign complaints to */
-export const ASSIGNABLE_STAFF = ['Staff 1', 'Staff 2', 'Staff 3', 'Staff 4', 'Staff 5'] as const
+export const ASSIGNABLE_STAFF = ['Staff 1', 'Staff 2', 'Staff 3', 'Staff 4'] as const
 
 export type AssignableStaff = (typeof ASSIGNABLE_STAFF)[number]
 

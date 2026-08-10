@@ -23,7 +23,7 @@ npm run sync          # start: pull latest from GitHub
 npm run finish -- "…" # finish: commit + push (Vercel updates)
 ```
 
-### Demo admin login
+### Demo admin login (full access)
 
 - Email: `admin@mylocalvoice.in`
 - Password: `admin123`

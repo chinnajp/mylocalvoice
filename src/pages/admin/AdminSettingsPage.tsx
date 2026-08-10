@@ -63,7 +63,10 @@ export function AdminSettingsPage() {
         <p className="text-sm text-vc-muted">Role: {roleLabel(admin?.role)}</p>
         <div className="text-xs text-vc-muted border-t border-vc-border pt-3 space-y-1">
           <p>
-            <strong className="text-white">President:</strong> Assign + Close + Delete + all statuses
+            <strong className="text-white">Admin:</strong> Assign + Close + Delete + all statuses
+          </p>
+          <p>
+            <strong className="text-white">President:</strong> Assign + Close + all statuses
           </p>
           <p>
             <strong className="text-white">Staff:</strong> Verified → In Progress → Resolved only

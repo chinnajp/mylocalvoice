@@ -107,6 +107,13 @@ const ADMINS = [
   {
     email: 'admin@mylocalvoice.in',
     password: 'admin123',
+    displayName: 'Admin',
+    role: 'super_admin',
+    villageId: 'thiruppair',
+  },
+  {
+    email: 'president@mylocalvoice.in',
+    password: 'president123',
     displayName: 'Village President',
     role: 'president',
     villageId: 'thiruppair',
@@ -162,5 +169,6 @@ await db.collection('villages').doc('thiruppair').set(
 )
 
 console.log('Cloud setup complete.')
-console.log('Login: admin@mylocalvoice.in / admin123')
+console.log('Admin:      admin@mylocalvoice.in / admin123')
+console.log('President:  president@mylocalvoice.in / president123')
 console.log('View data: https://console.firebase.google.com/project/mylocalvoice-a73f4/firestore')

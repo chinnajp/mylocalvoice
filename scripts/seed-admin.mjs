@@ -46,6 +46,13 @@ const ADMINS = [
   {
     email: 'admin@mylocalvoice.in',
     password: 'admin123',
+    displayName: 'Admin',
+    role: 'super_admin',
+    villageId: 'thiruppair',
+  },
+  {
+    email: 'president@mylocalvoice.in',
+    password: 'president123',
     displayName: 'Village President',
     role: 'president',
     villageId: 'thiruppair',
@@ -78,13 +85,6 @@ const ADMINS = [
     role: 'staff',
     villageId: 'thiruppair',
   },
-  {
-    email: 'staff5@mylocalvoice.in',
-    password: 'staff123',
-    displayName: 'Staff 5',
-    role: 'staff',
-    villageId: 'thiruppair',
-  },
 ]
 
 async function upsertAdmin(entry) {
@@ -104,10 +104,15 @@ async function upsertAdmin(entry) {
     })
   }
 
+  const displayName =
+    entry.displayName === 'Main Admin' || entry.displayName === 'Super Admin'
+      ? 'Admin'
+      : entry.displayName
+
   await db.collection('admins').doc(user.uid).set(
     {
       email: entry.email,
-      displayName: entry.displayName,
+      displayName,
       role: entry.role,
       villageId: entry.villageId,
     },
@@ -131,5 +136,7 @@ await db.collection('villages').doc('thiruppair').set(
   { merge: true },
 )
 
-console.log('Done. Login: admin@mylocalvoice.in / admin123')
+console.log('Done.')
+console.log('Admin:      admin@mylocalvoice.in / admin123')
+console.log('President:  president@mylocalvoice.in / president123')
 process.exit(0)

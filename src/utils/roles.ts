@@ -22,8 +22,9 @@ export function canCloseComplaints(role: AdminRole | undefined) {
   return isLeadership(role)
 }
 
+/** Only Admin (super_admin) may permanently delete complaints */
 export function canDeleteComplaints(role: AdminRole | undefined) {
-  return isLeadership(role)
+  return role === 'super_admin'
 }
 
 export function allowedStatusesForRole(role: AdminRole | undefined): ComplaintStatus[] {
@@ -35,7 +36,7 @@ export function canSetStatus(role: AdminRole | undefined, status: ComplaintStatu
   return allowedStatusesForRole(role).includes(status)
 }
 
-/** President: all complaints. Staff: only complaints assigned to their displayName (Staff 1…5). */
+/** President: all complaints. Staff: only complaints assigned to their displayName (Staff 1…4). */
 export function canEditComplaint(
   admin: Pick<AdminUser, 'role' | 'displayName'> | null | undefined,
   complaint: Pick<Complaint, 'assignedTo'> | null | undefined,
@@ -51,6 +52,6 @@ export function canEditComplaint(
 export function roleLabel(role: AdminRole | undefined) {
   if (role === 'president') return 'Village President'
   if (role === 'staff') return 'Panchayat Staff'
-  if (role === 'super_admin') return 'Super Admin'
+  if (role === 'super_admin') return 'Admin'
   return 'Admin'
 }

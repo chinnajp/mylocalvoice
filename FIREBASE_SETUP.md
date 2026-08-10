@@ -23,10 +23,11 @@ Emulator UI: http://127.0.0.1:4000
 
 ### Demo logins (seeded)
 
-| Role      | Email                   | Password  |
-|-----------|-------------------------|-----------|
-| President | admin@mylocalvoice.in   | admin123  |
-| Staff     | staff1@mylocalvoice.in  | staff123  |
+| Role        | Email                      | Password      |
+|-------------|----------------------------|---------------|
+| Admin       | admin@mylocalvoice.in      | admin123      |
+| President   | president@mylocalvoice.in  | president123  |
+| Staff 1–4   | staff1…staff4@mylocalvoice.in | staff123   |
 
 ## Production cloud project (`mylocalvoice-a73f4`)
 

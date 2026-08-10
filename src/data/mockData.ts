@@ -204,7 +204,7 @@ export const mockComplaints: Complaint[] = [
     adminNotes: [],
     beforePhotos: [],
     afterPhotos: [],
-    assignedTo: 'Staff 5',
+    assignedTo: 'Staff 4',
     createdAt: daysAgo(4),
     updatedAt: daysAgo(1),
   },
@@ -324,14 +324,23 @@ export const mockActivityLog: ActivityLogEntry[] = [
   },
 ]
 
+/** Admin — full access (super_admin) */
 export const DEMO_ADMIN = {
   email: 'admin@mylocalvoice.in',
   password: 'admin123',
-  displayName: 'Panchayat President',
+  displayName: 'Admin',
+  role: 'super_admin' as const,
+}
+
+/** Village president account (full leadership access) */
+export const DEMO_PRESIDENT = {
+  email: 'president@mylocalvoice.in',
+  password: 'president123',
+  displayName: 'Village President',
   role: 'president' as const,
 }
 
-/** Individual staff logins — displayName must match Assign To (Staff 1…5) */
+/** Individual staff logins — displayName must match Assign To (Staff 1…4) */
 export const DEMO_STAFF_MEMBERS = [
   {
     email: 'staff1@mylocalvoice.in',
@@ -357,15 +366,9 @@ export const DEMO_STAFF_MEMBERS = [
     displayName: 'Staff 4',
     role: 'staff' as const,
   },
-  {
-    email: 'staff5@mylocalvoice.in',
-    password: 'staff123',
-    displayName: 'Staff 5',
-    role: 'staff' as const,
-  },
 ] as const
 
 /** @deprecated use DEMO_STAFF_MEMBERS[0] */
 export const DEMO_STAFF = DEMO_STAFF_MEMBERS[0]
 
-export const DEMO_ADMINS = [DEMO_ADMIN, ...DEMO_STAFF_MEMBERS] as const
+export const DEMO_ADMINS = [DEMO_ADMIN, DEMO_PRESIDENT, ...DEMO_STAFF_MEMBERS] as const

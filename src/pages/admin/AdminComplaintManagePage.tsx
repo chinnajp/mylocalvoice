@@ -110,10 +110,15 @@ export function AdminComplaintManagePage() {
 
       <Card className="mb-4 border-sky-500/20 bg-sky-500/5">
         <p className="text-sm text-vc-muted">
-          {canAssign ? (
+          {canDelete ? (
             <>
-              As <strong className="text-white">President</strong> you can Assign (Staff 1–5), Close, and{' '}
+              As <strong className="text-white">Admin</strong> you can Assign (Staff 1–4), Close, and{' '}
               <strong className="text-white">Delete</strong> complaints. You may also set any status.
+            </>
+          ) : canAssign ? (
+            <>
+              As <strong className="text-white">President</strong> you can Assign (Staff 1–4) and Close
+              complaints. You may also set any status.
             </>
           ) : canEdit ? (
             <>

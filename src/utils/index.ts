@@ -66,7 +66,7 @@ export function getStatusBadgeClass(status: ComplaintStatus) {
     assigned: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
     in_progress: 'bg-yellow-500/15 text-yellow-300 border-yellow-500/30',
     resolved: 'bg-green-500/15 text-green-400 border-green-500/30',
-    closed: 'bg-slate-500/15 text-slate-400 border-slate-500/30',
+    closed: 'bg-green-500/15 text-green-400 border-green-500/30',
   }
   return map[status]
 }

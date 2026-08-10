@@ -70,8 +70,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return existing
   })
   const [admin, setAdmin] = useState<AdminUser | null>(() => {
-    const raw = localStorage.getItem('vc-admin')
-    return raw ? (JSON.parse(raw) as AdminUser) : null
+    try {
+      const raw = localStorage.getItem('vc-admin')
+      if (!raw) return null
+      const parsed = JSON.parse(raw) as AdminUser
+      // Migrate old label away from UI
+      if (parsed.displayName === 'Main Admin' || parsed.displayName === 'Super Admin') {
+        parsed.displayName = 'Admin'
+        localStorage.setItem('vc-admin', JSON.stringify(parsed))
+      }
+      return parsed
+    } catch {
+      return null
+    }
   })
   const [voterKey] = useState(() => {
     let key = localStorage.getItem('vc-voter')
