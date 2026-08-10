@@ -4,13 +4,10 @@
 
 ```bash
 npm install
-npm run functions:install  # Cloud Functions deps (OTP / status SMS)
-npm run emulators          # terminal 1 — Auth, Firestore, Storage, Functions, UI :4000
+npm run emulators          # terminal 1 — Auth :9099, Firestore :8080, Storage :9199, UI :4000
 npm run seed:admin         # terminal 2 — creates admin@mylocalvoice.in / admin123
 npm run dev                # terminal 2 — http://localhost:5173
 ```
-
-For OTP SMS, Maps, and production rollout see **PRODUCTION_SETUP.md**.
 
 Or one command after install:
 
@@ -58,11 +55,7 @@ Set the same `VITE_FIREBASE_*` values from local `.env`, plus:
 ```
 VITE_USE_MOCK_DATA=false
 VITE_USE_FIREBASE_EMULATOR=false
-VITE_USE_CLOUD_FUNCTIONS=true
-VITE_GOOGLE_MAPS_API_KEY=...
 ```
-
-Deploy functions after enabling Blaze if needed: `npm run functions:deploy`
 
 Never upload `serviceAccount.json` to Vercel or GitHub.
 

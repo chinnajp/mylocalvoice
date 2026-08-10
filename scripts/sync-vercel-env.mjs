@@ -25,14 +25,11 @@ const keys = [
   'VITE_VILLAGE_ID',
   'VITE_USE_MOCK_DATA',
   'VITE_USE_FIREBASE_EMULATOR',
-  'VITE_USE_CLOUD_FUNCTIONS',
-  'VITE_GOOGLE_MAPS_API_KEY',
 ]
 
 // Force cloud mode on Vercel
 vars.VITE_USE_MOCK_DATA = 'false'
 vars.VITE_USE_FIREBASE_EMULATOR = 'false'
-if (!vars.VITE_USE_CLOUD_FUNCTIONS) vars.VITE_USE_CLOUD_FUNCTIONS = 'true'
 
 const envs = ['production', 'preview', 'development']
 

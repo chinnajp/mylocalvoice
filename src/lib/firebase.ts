@@ -2,7 +2,6 @@ import { initializeApp, type FirebaseApp } from 'firebase/app'
 import { connectAuthEmulator, getAuth, type Auth } from 'firebase/auth'
 import { connectFirestoreEmulator, getFirestore, type Firestore } from 'firebase/firestore'
 import { connectStorageEmulator, getStorage, type FirebaseStorage } from 'firebase/storage'
-import { connectFunctionsEmulator, getFunctions, type Functions } from 'firebase/functions'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -20,16 +19,10 @@ export const useMockData =
   !firebaseConfig.apiKey ||
   firebaseConfig.apiKey === 'your_api_key'
 
-/** Use Cloud Functions for OTP / live SMS when not in pure mock mode */
-export const useCloudFunctions =
-  import.meta.env.VITE_USE_CLOUD_FUNCTIONS === 'true' ||
-  (!useMockData && import.meta.env.VITE_USE_CLOUD_FUNCTIONS !== 'false')
-
 let app: FirebaseApp | null = null
 let auth: Auth | null = null
 let db: Firestore | null = null
 let storage: FirebaseStorage | null = null
-let functions: Functions | null = null
 let emulatorsConnected = false
 
 if (!useMockData) {
@@ -37,18 +30,16 @@ if (!useMockData) {
   auth = getAuth(app)
   db = getFirestore(app)
   storage = getStorage(app)
-  functions = getFunctions(app)
 
   if (useEmulator && !emulatorsConnected) {
     connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true })
     connectFirestoreEmulator(db, '127.0.0.1', 8080)
     connectStorageEmulator(storage, '127.0.0.1', 9199)
-    connectFunctionsEmulator(functions, '127.0.0.1', 5001)
     emulatorsConnected = true
   }
 }
 
-export { app, auth, db, storage, functions, useEmulator }
+export { app, auth, db, storage, useEmulator }
 
 /**
  * Multi-village architecture:

@@ -1,5 +1,3 @@
-import { httpsCallable } from 'firebase/functions'
-import { functions, useCloudFunctions, useMockData } from '@/lib/firebase'
 import { sendNotification } from '@/services/notifications'
 import type { CitizenUser } from '@/types'
 
@@ -22,8 +20,6 @@ interface PendingOtp {
   code: string
   expiresAt: number
   attempts: number
-  /** When true, verification goes through Cloud Function */
-  cloud?: boolean
 }
 
 function normalizeMobile(mobile: string): string {
@@ -106,72 +102,19 @@ function generateOtp(): string {
 export interface SendOtpResult {
   mobile: string
   expiresInSec: number
-  /** Only set in demo/console mode — hidden when real SMS is live */
-  demoCode?: string
-  live: boolean
+  /** Shown in UI while SMS/WhatsApp providers are stubs */
+  demoCode: string
 }
 
-function mapCallableError(e: unknown): Error {
-  const code =
-    e && typeof e === 'object' && 'code' in e
-      ? String((e as { code?: string }).code || '')
-      : ''
-  const message =
-    e && typeof e === 'object' && 'message' in e
-      ? String((e as { message?: string }).message || '')
-      : ''
-  const detail = message.includes('/') ? message.split('/').pop() || message : message
-  if (detail.includes('INVALID_MOBILE') || code.includes('invalid-argument')) {
-    return new Error('INVALID_MOBILE')
+export async function sendCitizenOtp(mobileInput: string): Promise<SendOtpResult> {
+  const mobile = normalizeMobile(mobileInput)
+  if (!isValidMobile(mobile)) {
+    throw new Error('INVALID_MOBILE')
   }
-  if (detail.includes('OTP_EXPIRED') || code.includes('deadline-exceeded')) {
-    return new Error('OTP_EXPIRED')
-  }
-  if (detail.includes('OTP_TOO_MANY') || code.includes('resource-exhausted')) {
-    return new Error('OTP_TOO_MANY')
-  }
-  if (detail.includes('OTP_NOT_FOUND') || code.includes('not-found')) {
-    return new Error('OTP_NOT_FOUND')
-  }
-  if (detail.includes('OTP_INVALID') || code.includes('permission-denied')) {
-    return new Error('OTP_INVALID')
-  }
-  return new Error('OTP_SEND_FAILED')
-}
 
-async function sendOtpViaCloud(mobile: string): Promise<SendOtpResult> {
-  if (!functions) throw new Error('OTP_SEND_FAILED')
-  const callable = httpsCallable(functions, 'sendCitizenOtp')
-  try {
-    const res = await callable({ mobile })
-    const data = res.data as {
-      mobile: string
-      expiresInSec: number
-      live?: boolean
-      demoCode?: string
-    }
-    writePendingOtp({
-      mobile: data.mobile,
-      code: '',
-      expiresAt: Date.now() + (data.expiresInSec || 300) * 1000,
-      attempts: 0,
-      cloud: true,
-    })
-    return {
-      mobile: data.mobile,
-      expiresInSec: data.expiresInSec,
-      live: Boolean(data.live),
-      demoCode: data.demoCode,
-    }
-  } catch (e) {
-    throw mapCallableError(e)
-  }
-}
-
-async function sendOtpLocalDemo(mobile: string): Promise<SendOtpResult> {
   const code = generateOtp()
   const expiresAt = Date.now() + OTP_TTL_MS
-  writePendingOtp({ mobile, code, expiresAt, attempts: 0, cloud: false })
+  writePendingOtp({ mobile, code, expiresAt, attempts: 0 })
 
   const body = `MyLocalVoice OTP: ${code}. Valid for 5 minutes. Do not share.`
   await Promise.all([
@@ -183,20 +126,7 @@ async function sendOtpLocalDemo(mobile: string): Promise<SendOtpResult> {
     mobile,
     expiresInSec: Math.floor(OTP_TTL_MS / 1000),
     demoCode: code,
-    live: false,
   }
-}
-
-export async function sendCitizenOtp(mobileInput: string): Promise<SendOtpResult> {
-  const mobile = normalizeMobile(mobileInput)
-  if (!isValidMobile(mobile)) {
-    throw new Error('INVALID_MOBILE')
-  }
-
-  if (!useMockData && useCloudFunctions && functions) {
-    return sendOtpViaCloud(mobile)
-  }
-  return sendOtpLocalDemo(mobile)
 }
 
 export interface VerifyOtpResult {
@@ -205,34 +135,10 @@ export interface VerifyOtpResult {
   profile: CitizenProfile | null
 }
 
-async function verifyOtpViaCloud(mobile: string, code: string): Promise<VerifyOtpResult> {
-  if (!functions) throw new Error('OTP_NOT_FOUND')
-  const callable = httpsCallable(functions, 'verifyCitizenOtp')
-  try {
-    await callable({ mobile, otp: code })
-  } catch (e) {
-    throw mapCallableError(e)
-  }
-  writePendingOtp(null)
-  const profile = getCitizenProfile(mobile)
-  return {
-    mobile,
-    isNewUser: !profile?.fullName?.trim() || !profile?.areaId,
-    profile,
-  }
-}
-
-export async function verifyCitizenOtp(
-  mobileInput: string,
-  otpInput: string,
-): Promise<VerifyOtpResult> {
+export function verifyCitizenOtp(mobileInput: string, otpInput: string): VerifyOtpResult {
   const mobile = normalizeMobile(mobileInput)
   const code = otpInput.replace(/\D/g, '').slice(0, OTP_LENGTH)
   const pending = readPendingOtp()
-
-  if (pending?.cloud || (!useMockData && useCloudFunctions && functions)) {
-    return verifyOtpViaCloud(mobile, code)
-  }
 
   if (!pending || pending.mobile !== mobile) {
     throw new Error('OTP_NOT_FOUND')
