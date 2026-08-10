@@ -58,12 +58,11 @@ Set the same `VITE_FIREBASE_*` values from local `.env`, plus:
 ```
 VITE_USE_MOCK_DATA=false
 VITE_USE_FIREBASE_EMULATOR=false
-VITE_USE_CLOUD_FUNCTIONS=false
-VITE_USE_OTP_API=true
+VITE_USE_CLOUD_FUNCTIONS=true
 VITE_GOOGLE_MAPS_API_KEY=...
 ```
 
-Spark plan: OTP/SMS via Vercel `/api` (see PRODUCTION_SETUP.md). Cloud Functions need Blaze — leave off.
+Deploy functions after enabling Blaze if needed: `npm run functions:deploy`
 
 Never upload `serviceAccount.json` to Vercel or GitHub.
 

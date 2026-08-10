@@ -12,7 +12,6 @@ interface ImportMetaEnv {
   readonly VITE_USE_MOCK_DATA: string
   readonly VITE_USE_FIREBASE_EMULATOR: string
   readonly VITE_USE_CLOUD_FUNCTIONS: string
-  readonly VITE_USE_OTP_API: string
 }
 
 interface ImportMeta {
