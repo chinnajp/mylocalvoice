@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useApp } from '@/contexts/AppContext'
 import { Button } from '@/components/ui'
+import { AdminMobileBottomNav } from '@/components/layout/AdminMobileBottomNav'
 import { cn } from '@/utils'
 import { roleLabel } from '@/utils/roles'
 
@@ -255,10 +256,12 @@ export function AdminLayout() {
           </div>
         </header>
 
-        <div className="flex-1 p-3 sm:p-4 md:p-6 overflow-auto">
+        <div className="flex-1 p-3 sm:p-4 md:p-6 pb-24 md:pb-6 overflow-auto">
           <Outlet />
         </div>
       </div>
+
+      <AdminMobileBottomNav />
     </div>
   )
 }
